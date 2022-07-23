@@ -1,0 +1,7 @@
+version: 1.2
+workflows:
+   - name: data_model_report
+     subclass: WDL
+     primaryDescriptorPath: /data_model_report.wdl
+     testParameterFiles:
+         - /data_model_report.json

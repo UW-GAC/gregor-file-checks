@@ -1,0 +1,14 @@
+{
+    "data_model_report.table_files": {
+        "participant": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/participant.tsv",
+        "family": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/family.tsv",
+        "phenotype": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/phenotype.tsv",
+        "analyte": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/analyte.tsv",
+        "experiment_dna_short_read": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/experiment_dna_short_read.tsv",
+        "aligned_dna_short_read": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/aligned_dna_short_read.tsv",
+        "aligned_dna_short_read_set": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/aligned_dna_short_read_set.tsv",
+        "called_variants_dna_short_read": "gs://fc-88ee0a4a-cc80-4d0b-868d-2bd35ed2386d/called_variants_dna_short_read.tsv"
+    },
+    "data_model_report.model_url": "https://raw.githubusercontent.com/UW-GAC/gregor_data_models/main/GREGoR_data_model.tsv",
+    "data_model_report.out_prefix": "test"
+}

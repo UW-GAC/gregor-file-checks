@@ -1,0 +1,4 @@
+participant_id	term_id	presence	ontology	additional_details	onset_age_range	additional_modifiers
+UW_DCC_participant_123	HP:0001627	present	HPO			HP:0025226
+UW_DCC_participant_125	HP:0001637	absent	HPO	cardiac abnormality differs from participant_123		
+UW_DCC_participant_125	HP:0001647	present	HPO		HP:0003577	

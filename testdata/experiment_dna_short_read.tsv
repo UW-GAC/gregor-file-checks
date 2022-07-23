@@ -1,0 +1,2 @@
+experiment_dna_short_read_id	analyte_id	experiment_sample_id	seq_library_prep_kit_method	read_length	experiment_type	targeted_region_bed_filename	targeted_region_bed_file_uri	date_data_generation	target_insert_size	sequencing_platform
+UW_DCC_experiment_1	UW_DCC_analyte_1	H7YG5DSX2-3-IDUDI0014-1	Kappa Hyper PCR plus	100	exome	experiment_1.bed	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_1.bed	2022-06-29	600	Illumina NovaSeq6000

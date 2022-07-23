@@ -1,0 +1,2 @@
+called_variants_dna_file	md5sum	caller_software	variant_types	analysis_details
+gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/variants_file.vcf	129c28163df082	gatk4.1.2	snv|indel	10.5281/zenodo.4469317
