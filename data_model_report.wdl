@@ -46,6 +46,6 @@ task results{
     }
 
     runtime {
-        docker: "uwgac/anvildatamodels:0.1.0"
+        docker: "uwgac/gregor-file-checks:0.1.0"
     }
 }
