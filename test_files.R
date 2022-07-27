@@ -76,6 +76,7 @@ aligned_dna_short_read_set <- tibble(
 )
 
 called_variants_dna_short_read <- tibble(
+    aligned_dna_short_read_set_id = "UW_DCC_H7YG5DSX2-3-IDUDI0014-1",
     called_variants_dna_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/variants_file.vcf",
     md5sum = "129c28163df082",
     caller_software = "gatk4.1.2",
