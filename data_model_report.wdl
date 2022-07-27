@@ -33,7 +33,7 @@ task results{
     }
 
     command {
-        Rscript /usr/local/primed-file-checks/data_model_report.R \
+        Rscript /usr/local/gregor-file-checks/data_model_report.R \
             --table_files ${write_map(table_files)} \
             --model_file ${model_url} \
             --out_prefix ${out_prefix}
