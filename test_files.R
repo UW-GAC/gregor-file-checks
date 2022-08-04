@@ -38,31 +38,31 @@ phenotype <- tibble(
 )
 
 analyte <- tibble(
-    analyte_id = "UW_DCC_analyte_1",
-    participant_id = "UW_DCC_participant_123",
+    analyte_id = c("UW_DCC_analyte_1", "UW_DCC_analyte_2"),
+    participant_id = c("UW_DCC_participant_123", "UW_DCC_participant_125"),
     analyte_type = "DNA",
     primary_biosample = "UBERON:0000479"
 )
 
 experiment_dna_short_read <- tibble(
-    experiment_dna_short_read_id = "UW_DCC_experiment_1",
-    analyte_id = "UW_DCC_analyte_1",
-    experiment_sample_id = "H7YG5DSX2-3-IDUDI0014-1",
+    experiment_dna_short_read_id = c("UW_DCC_experiment_1", "UW_DCC_experiment_2"),
+    analyte_id = c("UW_DCC_analyte_1", "UW_DCC_analyte_2"),
+    experiment_sample_id = c("H7YG5DSX2-3-IDUDI0014-1", "H7YG5DSX2-5-IDUDI0126-1"),
     seq_library_prep_kit_method = "Kappa Hyper PCR plus",
     read_length = 100,
     experiment_type = "exome",
-    targeted_region_bed_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_1.bed",
+    targeted_region_bed_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/regions_1.bed",
     date_data_generation = "2022-06-29",
     target_insert_size = 600,
     sequencing_platform = "Illumina NovaSeq6000"
 )
 
 aligned_dna_short_read = tibble(
-    aligned_dna_short_read_id = "UW_DCC_H7YG5DSX2-3-IDUDI0014-1",
-    experiment_dna_short_read_id = "UW_DCC_experiment_1",
-    aligned_dna_short_read_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_1.bam",
-    aligned_dna_short_read_index_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_1.bai",
-    md5sum = "d3b07384d113edec49eaa6238ad5ff00",
+    aligned_dna_short_read_id = c("UW_DCC_H7YG5DSX2-3-IDUDI0014-1", "UW_DCC_H7YG5DSX2-5-IDUDI0126-1"),
+    experiment_dna_short_read_id = c("UW_DCC_experiment_1", "UW_DCC_experiment_2"),
+    aligned_dna_short_read_file = paste0("gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_", 1:2, ".bam"),
+    aligned_dna_short_read_index_file = paste0("gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_", 1:2, ".bai"),
+    md5sum = c("d3b07384d113edec49eaa6238ad5ff00", "a7457a3403aa8e4616ce64bfae86655c"),
     reference_assembly = "GRCh38",
     alignment_software = "BWA-MEM-2.3",
     mean_coverage = 100,
@@ -71,13 +71,13 @@ aligned_dna_short_read = tibble(
 
 aligned_dna_short_read_set <- tibble(
     aligned_dna_short_read_set_id = "UW_DCC_H7YG5DSX2-3-IDUDI0014-1",
-    aligned_dna_short_read_id = "UW_DCC_H7YG5DSX2-3-IDUDI0014-1"
+    aligned_dna_short_read_id = c("UW_DCC_H7YG5DSX2-3-IDUDI0014-1", "UW_DCC_H7YG5DSX2-5-IDUDI0126-1")
 )
 
 called_variants_dna_short_read <- tibble(
     aligned_dna_short_read_set_id = "UW_DCC_H7YG5DSX2-3-IDUDI0014-1",
     called_variants_dna_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/variants_file.vcf",
-    md5sum = "129c28163df082",
+    md5sum = "efdf612a01049cc6e99470ad92b0326e",
     caller_software = "gatk4.1.2",
     variant_types = "snv|indel",
     analysis_details = "10.5281/zenodo.4469317"

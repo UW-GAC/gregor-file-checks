@@ -1,2 +1,2 @@
 aligned_dna_short_read_set_id	called_variants_dna_file	md5sum	caller_software	variant_types	analysis_details
-UW_DCC_H7YG5DSX2-3-IDUDI0014-1	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/variants_file.vcf	129c28163df082	gatk4.1.2	snv|indel	10.5281/zenodo.4469317
+UW_DCC_H7YG5DSX2-3-IDUDI0014-1	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/variants_file.vcf	efdf612a01049cc6e99470ad92b0326e	gatk4.1.2	snv|indel	10.5281/zenodo.4469317

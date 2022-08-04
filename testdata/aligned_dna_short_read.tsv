@@ -1,2 +1,3 @@
 aligned_dna_short_read_id	experiment_dna_short_read_id	aligned_dna_short_read_file	aligned_dna_short_read_index_file	md5sum	reference_assembly	alignment_software	mean_coverage	analysis_details
 UW_DCC_H7YG5DSX2-3-IDUDI0014-1	UW_DCC_experiment_1	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_1.bam	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_1.bai	d3b07384d113edec49eaa6238ad5ff00	GRCh38	BWA-MEM-2.3	100	10.5281/zenodo.4469317
+UW_DCC_H7YG5DSX2-5-IDUDI0126-1	UW_DCC_experiment_2	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_2.bam	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_2.bai	a7457a3403aa8e4616ce64bfae86655c	GRCh38	BWA-MEM-2.3	100	10.5281/zenodo.4469317
