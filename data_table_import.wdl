@@ -37,7 +37,7 @@ task results{
     }
     
     command {
-        Rscript /usr/local/primed-file-checks/data_table_import.R \
+        Rscript /usr/local/gregor-file-checks/data_table_import.R \
             --table_files ${write_map(table_files)} \
             --model_file ${model_url} ${true="--overwrite" false="" overwrite} \
             --workspace_name ${workspace_name} \
