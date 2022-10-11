@@ -35,7 +35,7 @@ participant <- participant1 %>%
   mutate(gregor_center = "UW_DCC",
          consent_code = "GRU",
          proband_relationship = "Self",
-         sex = c("1"="M", "2"="F")[sex])
+         sex = c("1"="Male", "2"="Female")[sex])
 ```
 
 ```{r}
