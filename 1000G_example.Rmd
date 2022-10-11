@@ -1,0 +1,127 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Import data from 1000 genomes
+
+## Data tables
+
+```{r}
+library(AnVIL)
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+wn <- "1000G-high-coverage-2019"
+wns <- "anvil-datastorage"
+participant1 <- avtable("participant", name=wn, namespace=wns)
+sample <- avtable("sample", name=wn, namespace=wns)
+pedigree <- avtable("pedigree", name=wn, namespace=wns)
+qc <- avtable("qc_result_sample", name=wn, namespace=wns)
+sample_set <- avtable("sample_set", name=wn, namespace=wns)
+```
+
+```{r}
+participant <- participant1 %>%
+  left_join(pedigree, by=c(SAMPLE_NAME="pedigree_id")) %>%
+  select(participant_id = SAMPLE_NAME,
+         family_id = FamilyID,
+         paternal_id = FatherID,
+         maternal_id = MotherID,
+         sex = Sex,
+         ancestry_detail = Population) %>%
+  mutate(gregor_center = "UW_DCC",
+         consent_code = "GRU",
+         proband_relationship = "Self",
+         sex = c("1"="M", "2"="F")[sex])
+```
+
+```{r}
+family <- pedigree %>%
+  select(family_id = FamilyID) %>%
+  distinct() %>%
+  mutate(consanguinity = "Unknown")
+```
+
+```{r}
+phenotype <- pedigree %>%
+  filter(FatherID != "0" & MotherID != "0") %>%
+  select(participant_id = pedigree_id) %>%
+  mutate(term_id = "",
+         presence = "Unknown",
+         ontology = "HPO")
+```
+
+```{r}
+analyte <- sample %>%
+  select(analyte_id = sample_id,
+         participant_id = library_name) %>%
+  mutate(analyte_type = "DNA",
+         primary_biosample = "UBERON:0000479")
+```
+
+```{r}
+experiment_dna_short_read <- participant1 %>%
+  left_join(sample, by=c(participant_id="sample_id")) %>%
+  select(experiment_dna_short_read_id = EXPERIMENT_ID,
+         analyte_id = participant_id,
+         experiment_sample_id = SAMPLE_NAME,
+         target_insert_size = INSERT_SIZE,
+         seq_library_prep_kit_method = library_construction_protocol,
+         sequencing_platform = instrument_model) %>%
+  mutate(experiment_type = "genome")
+```
+
+```{r}
+aligned_dna_short_read <- participant1 %>%
+  left_join(qc, by=c(SAMPLE_NAME="qc_result_sample_id")) %>%
+  select(aligned_dna_short_read_id = participant_id,
+         experiment_dna_short_read_id = EXPERIMENT_ID,
+         aligned_dna_short_read_file = cram,
+         md5sum = MD5SUM, # this probably refers to the gVCF and not the CRAM
+         mean_coverage) %>%
+  mutate(aligned_dna_short_read_index_file = sub(".cram$", ".crai$", aligned_dna_short_read_file),
+         reference_assembly = "GRCh38",
+         alignment_software = "BWA-MEM bwakit-0.7.15",
+         analysis_details = "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_cov/NYGC_b38_pipeline_description.pdf")
+```
+
+```{r}
+set_index <- 1
+aligned_dna_short_read_set <- sample_set$samples.items[[set_index]] %>%
+  select(aligned_dna_short_read_id = entityName) %>%
+  mutate(aligned_dna_short_read_set_id = sample_set$sample_set_id[set_index])
+```
+
+```{r}
+called_variants_dna_short_read1 <- sample_set %>%
+  select(aligned_dna_short_read_set_id = sample_set_id, 
+         called_variants_dna_file = downsampled_VCF) %>%
+  unnest_longer(called_variants_dna_file) %>%
+  filter(!is.na(called_variants_dna_file)) %>%
+  mutate(caller_software = "GATK-3.5-0",
+         variant_types = "SNV | INDEL")
+
+md5 <- function(f) {
+  gsutil_pipe(f, "rb") %>%
+    openssl::md5() %>%
+    as.character()
+}
+called_variants_dna_short_read <- called_variants_dna_short_read1 %>%
+  rowwise() %>% # because md5 function is not vectorized
+  mutate(md5sum = md5(called_variants_dna_file))
+```
+
+```{r}
+bucket <- avbucket()
+
+table_names <- c("participant", "family", "phenotype", "analyte", "experiment_dna_short_read",
+                 "aligned_dna_short_read", "aligned_dna_short_read_set", "called_variants_dna_short_read")
+for (t in table_names) {
+  outfile <- paste0("1000G_", t, "_table.tsv")
+  readr::write_tsv(get(t), outfile)
+  gsutil_cp(outfile, bucket)
+}
+```
