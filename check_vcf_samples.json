@@ -1,0 +1,6 @@
+{
+    "check_vcf_samples.vcf_file": "${this.file_path}",
+    "check_vcf_samples.called_variants_dna_short_read_id": "${this.called_variants_dna_short_read_id}",
+    "check_vcf_samples.workspace_namespace": "GREGoR-ben",
+    "check_vcf_samples.workspace_name": "GREGoR_DCC_QC_dev"
+}
