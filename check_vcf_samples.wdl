@@ -67,7 +67,7 @@ task compare_sample_sets {
         aligned_table <- AnVIL::avtable('aligned_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
         experiments <- aligned_table[['experiment_dna_short_read_id']][aligned_table[['aligned_dna_short_read_id']] %in% aligned_reads]; \
         experiment_table <- AnVIL::avtable('experiment_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
-        if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiments else samples <- experiment_table[['experiment_sample_id']][experiment_table[['experiment_dna_short_read_id']] %in% experiments]; \
+        if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiment_table[['experiment_sample_id']][experiment_table[['experiment_dna_short_read_id']] %in% experiments] else samples <- experiments; \
         vcf_samples <- readLines('${sample_file}'); \
         if (setequal(samples, vcf_samples)) status <- 'PASS' else status <- 'FAIL'; \
         cat(status, file='status.txt') \
