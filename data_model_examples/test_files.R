@@ -89,11 +89,3 @@ for (t in table_names) {
     outfile <- paste0("testdata/", t, ".tsv")
     readr::write_tsv(get(t), outfile)
 }
-
-tibble(table_names,
-       paste0("testdata/", table_names, ".tsv")) %>%
-    readr::write_tsv("table_files.tsv", col_names=FALSE)
-
-tibble(table_names,
-       paste0("test_", table_names, "_table.tsv")) %>%
-    readr::write_tsv("table_files_import.tsv", col_names=FALSE)

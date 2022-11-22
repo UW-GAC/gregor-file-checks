@@ -1,15 +1,5 @@
 version: 1.2
 workflows:
-   - name: data_model_report
-     subclass: WDL
-     primaryDescriptorPath: /data_model_report.wdl
-     testParameterFiles:
-         - /data_model_report.json
-   - name: data_table_import
-     subclass: WDL
-     primaryDescriptorPath: /data_table_import.wdl
-     testParameterFiles:
-         - /data_table_import.json
    - name: check_vcf_samples
      subclass: WDL
      primaryDescriptorPath: /check_vcf_samples.wdl
