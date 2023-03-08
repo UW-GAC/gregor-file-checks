@@ -1,0 +1,15 @@
+{
+    "validate_data_model.table_files": {
+        "participant": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_participant_table.tsv",
+        "family": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_family_table.tsv",
+        "phenotype": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_phenotype_table.tsv",
+        "analyte": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_analyte_table.tsv",
+        "experiment_dna_short_read": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_experiment_dna_short_read_table.tsv",
+        "aligned_dna_short_read": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_aligned_dna_short_read_table.tsv",
+        "aligned_dna_short_read_set": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_aligned_dna_short_read_set_table.tsv",
+        "called_variants_dna_short_read": "gs://fc-e2187671-5d9d-4130-bfa2-5bf933952d6e/1000G_called_variants_dna_short_read_table.tsv"
+    },
+    "validate_data_model.model_url": "https://raw.githubusercontent.com/UW-GAC/gregor_data_models/main/GREGoR_data_model.json",
+    "validate_data_model.workspace_name": "GREGoR_DCC_upload_example",
+    "validate_data_model.workspace_namespace": "gregor-dcc"
+}
