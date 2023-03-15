@@ -6,10 +6,12 @@ workflow check_vcf_samples {
         String called_variants_dna_short_read_id
         String workspace_name
         String workspace_namespace
+        Int? mem_gb
     }
 
     call vcf_samples {
-        input: vcf_file = vcf_file
+        input: vcf_file = vcf_file,
+               mem_gb = mem_gb
     }
 
     call compare_sample_sets {
@@ -32,6 +34,7 @@ workflow check_vcf_samples {
 task vcf_samples {
     input {
         File vcf_file
+        Int mem_gb = 2
     }
 
     command {
@@ -44,6 +47,7 @@ task vcf_samples {
 
     runtime {
         docker: "xbrianh/xsamtools:v0.5.2"
+        memory: "~{mem_gb}GB"
     }
 }
 
