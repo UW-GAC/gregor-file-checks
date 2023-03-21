@@ -17,6 +17,7 @@ vcf_file | Google bucket path to a VCF file
 called_variants_dna_short_read_id | The id associated with the vcf_file
 workspace_name | A string with the workpsace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace name is "Terra-Workflows-Quickstart"
 workspace_namespace | A string with the workpsace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace namespace is "fc-product-demo"
+mem_gb | (optional, default 10 GB) RAM required. If the job fails due to lack of memory, try setting this to a larger value.
 
 The workflow returns the following outputs:
 
