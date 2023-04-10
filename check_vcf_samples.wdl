@@ -67,13 +67,13 @@ task compare_sample_sets {
         workspace_namespace <- '~{workspace_namespace}'; \
         id <- '~{called_variants_dna_short_read_id}'; \
         variants_table <- AnVIL::avtable('called_variants_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
-        aligned_set_id <- variants_table$aligned_dna_short_read_set_id[variants_table$called_variants_dna_short_read_id == id]; \
+        aligned_set_id <- variants_table[['aligned_dna_short_read_set_id']][variants_table[['called_variants_dna_short_read_id']] == id]; \
         aligned_set <- AnVIL::avtable('aligned_dna_short_read_set', name=workspace_name, namespace=workspace_namespace); \
-        aligned_reads <- aligned_set$aligned_dna_short_reads.items[aligned_set$aligned_dna_short_read_set_id == aligned_set_id][[1]]$entityName; \
+        aligned_reads <- aligned_set[['aligned_dna_short_reads.items']][aligned_set[['aligned_dna_short_read_set_id']] == aligned_set_id][[1]][['entityName']]; \
         aligned_table <- AnVIL::avtable('aligned_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
-        experiments <- aligned_table$experiment_dna_short_read_id[aligned_table$aligned_dna_short_read_id %in% aligned_reads]; \
+        experiments <- aligned_table[['experiment_dna_short_read_id']][aligned_table[['aligned_dna_short_read_id']] %in% aligned_reads]; \
         experiment_table <- AnVIL::avtable('experiment_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
-        if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiment_table$experiment_sample_id[experiment_table$experiment_dna_short_read_id %in% experiments] else samples <- experiments; \
+        if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiment_table[['experiment_sample_id']][experiment_table[['experiment_dna_short_read_id']] %in% experiments] else samples <- experiments; \
         writeLines(samples, 'workspace_samples.txt'); \
         vcf_samples <- readLines('~{sample_file}'); \
         if (setequal(samples, vcf_samples)) status <- 'PASS' else status <- 'FAIL'; \
