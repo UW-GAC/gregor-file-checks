@@ -77,7 +77,7 @@ task compare_sample_sets {
         writeLines(samples, 'workspace_samples.txt'); \
         vcf_samples <- readLines('~{sample_file}'); \
         if (setequal(samples, vcf_samples)) status <- 'PASS' else status <- 'FAIL'; \
-        cat(status, file='status.txt') \
+        cat(status, file='status.txt'); \
         if (status == 'FAIL') stop('Samples do not match; compare vcf_samples.txt and workspace_samples.txt')
         "
     >>>
