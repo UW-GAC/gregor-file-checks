@@ -34,7 +34,7 @@ workflow check_vcf_samples {
 task vcf_samples {
     input {
         File vcf_file
-        Int? disk_gb = 10
+        Int disk_gb = 10
     }
 
     command {
@@ -86,6 +86,6 @@ task compare_sample_sets {
     }
 
     runtime {
-        docker: "us.gcr.io/anvil-gcr-public/anvil-rstudio-bioconductor-devel:3.15.0"
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
     }
 }
