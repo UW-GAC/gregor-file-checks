@@ -23,8 +23,6 @@ workflow check_vcf_samples {
 
     output {
         String vcf_sample_check = compare_sample_sets.check_status
-        File vcf_sample_list = vcf_samples.sample_file
-        File workspace_sample_list = compare_sample_sets.workspace_samples
     }
 
      meta {
