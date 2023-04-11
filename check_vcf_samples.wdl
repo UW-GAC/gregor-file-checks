@@ -34,15 +34,15 @@ workflow check_vcf_samples {
 task vcf_samples {
     input {
         File vcf_file
-        Int? disk_gb = 10
+        Int disk_gb = 10
     }
 
     command {
-        bcftools query --list-samples ${vcf_file} > samples.txt
+        bcftools query --list-samples ${vcf_file} > vcf_samples.txt
     }
 
     output {
-        File sample_file = "samples.txt"
+        File sample_file = "vcf_samples.txt"
     }
 
     runtime {
@@ -59,11 +59,11 @@ task compare_sample_sets {
         String workspace_namespace
     }
 
-    command {
+    command <<<
         Rscript -e "\
-        workspace_name <- '${workspace_name}'; \
-        workspace_namespace <- '${workspace_namespace}'; \
-        id <- '${called_variants_dna_short_read_id}'; \
+        workspace_name <- '~{workspace_name}'; \
+        workspace_namespace <- '~{workspace_namespace}'; \
+        id <- '~{called_variants_dna_short_read_id}'; \
         variants_table <- AnVIL::avtable('called_variants_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
         aligned_set_id <- variants_table[['aligned_dna_short_read_set_id']][variants_table[['called_variants_dna_short_read_id']] == id]; \
         aligned_set <- AnVIL::avtable('aligned_dna_short_read_set', name=workspace_name, namespace=workspace_namespace); \
@@ -72,17 +72,20 @@ task compare_sample_sets {
         experiments <- aligned_table[['experiment_dna_short_read_id']][aligned_table[['aligned_dna_short_read_id']] %in% aligned_reads]; \
         experiment_table <- AnVIL::avtable('experiment_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
         if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiment_table[['experiment_sample_id']][experiment_table[['experiment_dna_short_read_id']] %in% experiments] else samples <- experiments; \
-        vcf_samples <- readLines('${sample_file}'); \
+        writeLines(samples, 'workspace_samples.txt'); \
+        vcf_samples <- readLines('~{sample_file}'); \
         if (setequal(samples, vcf_samples)) status <- 'PASS' else status <- 'FAIL'; \
-        cat(status, file='status.txt') \
+        cat(status, file='status.txt'); \
+        if (status == 'FAIL') stop('Samples do not match; compare vcf_samples.txt and workspace_samples.txt')
         "
-    }
+    >>>
 
     output {
         String check_status = read_string("status.txt")
+        File workspace_samples = "workspace_samples.txt"
     }
 
     runtime {
-        docker: "us.gcr.io/anvil-gcr-public/anvil-rstudio-bioconductor-devel:3.15.0"
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
     }
 }
