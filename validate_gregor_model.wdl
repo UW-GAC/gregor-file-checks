@@ -55,7 +55,7 @@ task select_md5_files {
         tables <- tables[names(tables) %in% names(md5_cols)]; \
         files <- list(); md5 <- list();
         for (t in names(md5_cols)) { \
-          dat <- readr::read_tsv(tables[[t]]); \
+          dat <- readr::read_tsv(tables[t]); \
           files[[t]] <- dat[[md5_cols[t]]]; \
           md5[[t]] <- dat[['md5sum']]; \
         }; \
