@@ -57,9 +57,9 @@ task select_md5_files {
         md5_cols <- md5_cols[intersect(names(md5_cols), tables[['table']])]; \
         files <- list(); md5 <- list();
         for (t in names(md5_cols)) { \
-          dat <- AnVIL::avtable(t, name=workspace_name, namespace=workspace_namespace) \
-          files[[t]] <- dat[[md5_cols[t]]] \
-          md5[[t]] <- dat[['md5sum']] \
+          dat <- AnVIL::avtable(t, name=workspace_name, namespace=workspace_namespace); \
+          files[[t]] <- dat[[md5_cols[t]]]; \
+          md5[[t]] <- dat[['md5sum']]; \
         }; \
         writeLines(unlist(files), 'file.txt'); \
         writeLines(unlist(md5), 'md5sum.txt'); \
