@@ -4,7 +4,8 @@ import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/valid
 
 workflow validate_gregor_model {
     input {
-        Map[String, File] table_files
+        #Map[String, File] table_files
+        Array[File] table_files
         String model_url
         String workspace_name
         String workspace_namespace
@@ -24,8 +25,7 @@ workflow validate_gregor_model {
     # }
 
     call select_md5_files {
-        input: workspace_name = workspace_name,
-               workspace_namespace = workspace_namespace
+        input: table_files = table_files
     }
 
     # output {
@@ -42,22 +42,20 @@ workflow validate_gregor_model {
 
 task select_md5_files {
     input {
-        String workspace_name
-        String workspace_namespace
+        Array[File] table_files
     }
 
     command <<<
         Rscript -e "\
-        workspace_name <- '~{workspace_name}'; \
-        workspace_namespace <- '~{workspace_namespace}'; \
-        tables <- AnVIL::avtables(name=workspace_name, namespace=workspace_namespace); \
+        tables <- readLines(~{write_lines(table_files)}); \
+        names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
         md5_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_file', \
           'called_variants_dna_short_read'='called_variants_dna_file', \
           'aligned_rna_short_read'='aligned_rna_short_read_file'); \
-        md5_cols <- md5_cols[intersect(names(md5_cols), tables[['table']])]; \
+        tables <- tables[names(tables) %in% names(md5_cols)]; \
         files <- list(); md5 <- list();
         for (t in names(md5_cols)) { \
-          dat <- AnVIL::avtable(t, name=workspace_name, namespace=workspace_namespace); \
+          dat <- readr::read_tsv(tables[[t]]); \
           files[[t]] <- dat[[md5_cols[t]]]; \
           md5[[t]] <- dat[['md5sum']]; \
         }; \
