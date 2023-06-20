@@ -1,11 +1,11 @@
 version 1.0
 
 import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/validate_data_model.wdl" as validate
+import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/check_md5.wdl" as md5
 
 workflow validate_gregor_model {
     input {
-        #Map[String, File] table_files
-        Array[File] table_files
+        Map[String, File] table_files
         String model_url
         String workspace_name
         String workspace_namespace
@@ -14,24 +14,32 @@ workflow validate_gregor_model {
         Int? hash_id_nchar
     }
 
-    # call validate.results {
-    #     input: table_files = table_files,
-    #            model_url = model_url,
-    #            hash_id_nchar = hash_id_nchar,
-    #            workspace_name = workspace_name,
-    #            workspace_namespace = workspace_namespace,
-    #            overwrite = overwrite,
-    #            import_tables = import_tables
-    # }
+    call validate.validate_data_model {
+        input: table_files = table_files,
+               model_url = model_url,
+               hash_id_nchar = hash_id_nchar,
+               workspace_name = workspace_name,
+               workspace_namespace = workspace_namespace,
+               overwrite = overwrite,
+               import_tables = import_tables
+    }
 
     call select_md5_files {
         input: table_files = table_files
     }
 
-    # output {
-    #     File validation_report = results.validation_report
-    #     Array[File]? tables = results.tables
-    # }
+    scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
+        call md5.check_md5 {
+            input: file = pair.left,
+                   md5um = pair.right
+        }
+    }
+
+    output {
+        File validation_report = validate_data_model.validation_report
+        Array[File]? tables = validate_data_model.tables
+        Array[String] md5_check = check_md5.md5_check
+    }
 
      meta {
           author: "Stephanie Gogarten"
@@ -53,7 +61,6 @@ task select_md5_files {
           'called_variants_dna_short_read'='called_variants_dna_file', \
           'aligned_rna_short_read'='aligned_rna_short_read_file'); \
         tables <- tables[names(tables) %in% names(md5_cols)]; \
-        print(tables)
         files <- list(); md5 <- list();
         for (t in names(tables)) { \
           dat <- readr::read_tsv(tables[t]); \
