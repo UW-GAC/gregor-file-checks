@@ -71,6 +71,9 @@ task select_md5_files {
         Array[String] md5sum_to_check = read_lines("md5sum.txt")
     }
 
+    runtime {
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
+    }
 }
 
 
