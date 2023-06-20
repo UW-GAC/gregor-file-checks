@@ -53,8 +53,9 @@ task select_md5_files {
           'called_variants_dna_short_read'='called_variants_dna_file', \
           'aligned_rna_short_read'='aligned_rna_short_read_file'); \
         tables <- tables[names(tables) %in% names(md5_cols)]; \
+        print(tables)
         files <- list(); md5 <- list();
-        for (t in names(md5_cols)) { \
+        for (t in names(tables)) { \
           dat <- readr::read_tsv(tables[t]); \
           files[[t]] <- dat[[md5_cols[t]]]; \
           md5[[t]] <- dat[['md5sum']]; \
