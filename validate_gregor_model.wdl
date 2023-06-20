@@ -47,7 +47,7 @@ task select_md5_files {
 
     command <<<
         Rscript -e "\
-        tables <- readLines(~{write_lines(table_files)}); \
+        tables <- readLines('~{write_lines(table_files)}'); \
         names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
         md5_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_file', \
           'called_variants_dna_short_read'='called_variants_dna_file', \
