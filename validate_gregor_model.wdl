@@ -24,21 +24,25 @@ workflow validate_gregor_model {
                import_tables = import_tables
     }
 
-    call select_md5_files {
-        input: table_files = table_files
-    }
+    Array[File] val_tables = select_first([validate_data_model.tables, ""])
 
-    scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
-        call md5.check_md5 {
-            input: file = pair.left,
-                   md5um = pair.right
+    if (defined(validate_data_model.tables)) {
+        call select_md5_files {
+            input: validated_table_files = val_tables
+        }
+
+        scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
+            call md5.check_md5 {
+                input: file = pair.left,
+                     md5sum = pair.right
+            }
         }
     }
 
     output {
         File validation_report = validate_data_model.validation_report
         Array[File]? tables = validate_data_model.tables
-        Array[String] md5_check = check_md5.md5_check
+        Array[String]? md5_check = check_md5.md5_check
     }
 
      meta {
@@ -50,12 +54,12 @@ workflow validate_gregor_model {
 
 task select_md5_files {
     input {
-        Array[File] table_files
+        Array[File] validated_table_files
     }
 
     command <<<
         Rscript -e "\
-        tables <- readLines('~{write_lines(table_files)}'); \
+        tables <- readLines('~{write_lines(validated_table_files)}'); \
         names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
         md5_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_file', \
           'called_variants_dna_short_read'='called_variants_dna_file', \
