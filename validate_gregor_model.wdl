@@ -48,7 +48,7 @@ workflow validate_gregor_model {
         File validation_report = validate_data_model.validation_report
         Array[File]? tables = validate_data_model.tables
         String? md5_check_summary = summarize_md5_check.summary
-        File? md5_check_details = summarize_md5_check.details
+        File? md5_check_details3 = summarize_md5_check.details
     }
 
      meta {
@@ -112,7 +112,7 @@ task summarize_md5_check {
     >>>
     
     output {
-        String summary = "summary.txt"
+        String summary = read_string("summary.txt")
         File details = "details.txt"
     }
 
