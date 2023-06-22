@@ -51,7 +51,7 @@ workflow validate_gregor_model {
             input: validated_table_files = val_tables
         }
 
-        if (select_vcf_files.files_to_check[0] != "NULL") {
+        if (import_tables && select_vcf_files.files_to_check[0] != "NULL") {
             scatter (pair in zip(select_vcf_files.files_to_check, select_vcf_files.ids_to_check)) {
                 call vcf.check_vcf_samples {
                     input: vcf_file = pair.left,
