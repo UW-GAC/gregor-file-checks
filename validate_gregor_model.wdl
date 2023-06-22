@@ -39,7 +39,7 @@ workflow validate_gregor_model {
                 }
             }
 
-            call summarize_md5_check {
+            call md5.summarize_md5_check {
                 input: file = select_md5_files.files_to_check,
                     md5_check = check_md5.md5_check
             }
@@ -92,35 +92,6 @@ task select_md5_files {
     output {
         Array[String] files_to_check = read_lines("file.txt")
         Array[String] md5sum_to_check = read_lines("md5sum.txt")
-    }
-
-    runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
-    }
-}
-
-
-task summarize_md5_check {
-    input {
-        Array[String] file
-        Array[String] md5_check
-    }
-
-    command <<<
-        Rscript -e "\
-        files <- readLines('~{write_lines(file)}'); \
-        checks <- readLines('~{write_lines(md5_check)}'); \
-        library(dplyr); \
-        dat <- tibble(file_path=files, md5_check=checks); \
-        readr::write_tsv(dat, 'details.txt'); \
-        ct <- mutate(count(dat, md5_check), x=paste(n, md5_check)); \
-        writeLines(paste(ct[['x']], collapse=', '), 'summary.txt'); \
-        "
-    >>>
-    
-    output {
-        String summary = read_string("summary.txt")
-        File details = "details.txt"
     }
 
     runtime {
