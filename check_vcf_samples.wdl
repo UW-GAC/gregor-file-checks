@@ -89,3 +89,32 @@ task compare_sample_sets {
         docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
     }
 }
+
+
+task summarize_vcf_check {
+    input {
+        Array[String] file
+        Array[String] vcf_check
+    }
+
+    command <<<
+        Rscript -e "\
+        files <- readLines('~{write_lines(file)}'); \
+        checks <- readLines('~{write_lines(vcf_check)}'); \
+        library(dplyr); \
+        dat <- tibble(file_path=files, vcf_check=checks); \
+        readr::write_tsv(dat, 'details.txt'); \
+        ct <- mutate(count(dat, vcf_check), x=paste(n, vcf_check)); \
+        writeLines(paste(ct[['x']], collapse=', '), 'summary.txt'); \
+        "
+    >>>
+    
+    output {
+        String summary = read_string("summary.txt")
+        File details = "details.txt"
+    }
+
+    runtime {
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
+    }
+}
