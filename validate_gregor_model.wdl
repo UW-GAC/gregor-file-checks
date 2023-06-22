@@ -31,16 +31,18 @@ workflow validate_gregor_model {
             input: validated_table_files = val_tables
         }
 
-        scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
-            call md5.check_md5 {
-                input: file = pair.left,
-                     md5sum = pair.right
+        if (select_md5_files.files_to_check[0] != "NULL") {
+            scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
+                call md5.check_md5 {
+                    input: file = pair.left,
+                        md5sum = pair.right
+                }
             }
-        }
 
-        call summarize_md5_check {
-            input: file = select_md5_files.files_to_check,
-                   md5_check = check_md5.md5_check
+            call summarize_md5_check {
+                input: file = select_md5_files.files_to_check,
+                    md5_check = check_md5.md5_check
+            }
         }
     }
 
@@ -77,8 +79,13 @@ task select_md5_files {
           files[[t]] <- dat[[md5_cols[t]]]; \
           md5[[t]] <- dat[['md5sum']]; \
         }; \
-        writeLines(unlist(files), 'file.txt'); \
-        writeLines(unlist(md5), 'md5sum.txt'); \
+        if (length(files) > 0) { \
+          writeLines(unlist(files), 'file.txt'); \
+          writeLines(unlist(md5), 'md5sum.txt'); \
+        } else { \
+          writeLines('NULL', 'file.txt'); \
+          writeLines('NULL', 'md5sum.txt'); \
+        } \
         "
     >>>
 
