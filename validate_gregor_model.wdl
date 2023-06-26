@@ -26,6 +26,7 @@ workflow validate_gregor_model {
                import_tables = import_tables
     }
 
+    # need this because validate_data_model.tables is optional but input to select_md5_files is required
     Array[File] val_tables = select_first([validate_data_model.tables, ""])
 
     if (defined(validate_data_model.tables)) {
@@ -51,6 +52,7 @@ workflow validate_gregor_model {
             input: validated_table_files = val_tables
         }
 
+        # can only check VCF files once tables are imported since check_vcf_samples reads tables
         if (import_tables && select_vcf_files.files_to_check[0] != "NULL") {
             scatter (pair in zip(select_vcf_files.files_to_check, select_vcf_files.ids_to_check)) {
                 call vcf.check_vcf_samples {
