@@ -1,0 +1,18 @@
+{
+    "validate_gregor_model.table_files": {
+        "participant": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/participant.tsv",
+        "phenotype": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/phenotype.tsv",
+        "family": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/family.tsv",
+        "analyte": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/analyte.tsv",
+        "experiment_dna_short_read": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/experiment_dna_short_read.tsv",
+        "aligned_dna_short_read": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/aligned_dna_short_read.tsv",
+        "called_variants_dna_short_read": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/called_variants_dna_short_read.tsv",
+        "experiment_rna_short_read": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/experiment_rna_short_read.tsv",
+        "aligned_rna_short_read": "gs://fc-efda2373-416d-45db-bde6-b3ad08bf9d79/data_tables/aligned_rna_short_read.tsv"
+    },
+    "validate_gregor_model.model_url": "https://raw.githubusercontent.com/UW-GAC/gregor_data_models/main/GREGoR_data_model.json",
+    "validate_gregor_model.import_tables": true,
+    "validate_gregor_model.overwrite": true,
+    "validate_gregor_model.workspace_name": "GREGoR_DCC_test",
+    "validate_gregor_model.workspace_namespace": "gregor-dcc-scratch"
+}

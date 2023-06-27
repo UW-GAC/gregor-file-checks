@@ -1,0 +1,3 @@
+aligned_rna_short_read_id	experiment_rna_short_read_id	aligned_rna_short_read_file	aligned_rna_short_read_index_file	md5sum	reference_assembly	alignment_software	mean_coverage	gene_annotation	gene_annotation_details
+UW_DCC_H7YG5DSX2-3-IDUDI0014-1	UW_DCC_experiment_1	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/rna_experiment_1.bam	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/rna_experiment_1.bai	a3b07384d113edec49eaa6238ad5ff00	GRCh38	BWA-MEM-2.3	100	GENCODEv35	gencode_comprehensive_chr
+UW_DCC_H7YG5DSX2-5-IDUDI0126-1	UW_DCC_experiment_2	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/rna_experiment_2.bam	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/rna_experiment_2.bai	b7457a3403aa8e4616ce64bfae86655c	GRCh38	BWA-MEM-2.3	100	GENCODEv35	gencode_comprehensive_chr

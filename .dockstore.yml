@@ -1,5 +1,10 @@
 version: 1.2
 workflows:
+   - name: validate_gregor_model
+     subclass: WDL
+     primaryDescriptorPath: /validate_gregor_model.wdl
+     testParameterFiles:
+         - /validate_gregor_model.json
    - name: check_vcf_samples
      subclass: WDL
      primaryDescriptorPath: /check_vcf_samples.wdl
