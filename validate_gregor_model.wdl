@@ -139,7 +139,7 @@ task select_vcf_files {
         vcf_cols <- c('called_variants_dna_short_read'='called_variants_dna_file'); \
         id_cols <- c('called_variants_dna_short_read'='called_variants_dna_short_read_id'); \
         tables <- tables[names(tables) %in% names(vcf_cols)]; \
-        files <- list(); ids <- list();
+        files <- list(); ids <- list(); \
         for (t in names(tables)) { \
           dat <- readr::read_tsv(tables[t]); \
           files[[t]] <- dat[[vcf_cols[t]]]; \
