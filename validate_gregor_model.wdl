@@ -14,6 +14,7 @@ workflow validate_gregor_model {
         Boolean import_tables = false
         Int? hash_id_nchar
         Int? vcf_disk_gb
+        String? project_id
     }
 
     call validate.validate_data_model {
@@ -38,7 +39,8 @@ workflow validate_gregor_model {
             scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
                 call md5.check_md5 {
                     input: file = pair.left,
-                        md5sum = pair.right
+                        md5sum = pair.right,
+                        project_id = project_id
                 }
             }
 
