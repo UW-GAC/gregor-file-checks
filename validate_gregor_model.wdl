@@ -12,6 +12,8 @@ workflow validate_gregor_model {
         String workspace_namespace
         Boolean overwrite = false
         Boolean import_tables = false
+        Boolean check_md5 = true
+        Boolean check_vcf = true
         Int? hash_id_nchar
         Int? vcf_disk_gb
         String? project_id
@@ -31,44 +33,48 @@ workflow validate_gregor_model {
     Array[File] val_tables = select_first([validate_data_model.tables, ""])
 
     if (defined(validate_data_model.tables)) {
-        call select_md5_files {
-            input: validated_table_files = val_tables
-        }
+        if (check_md5) {
+            call select_md5_files {
+                input: validated_table_files = val_tables
+            }
 
-        if (select_md5_files.files_to_check[0] != "NULL") {
-            scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
-                call md5.check_md5 {
-                    input: file = pair.left,
-                        md5sum = pair.right,
-                        project_id = project_id
+            if (select_md5_files.files_to_check[0] != "NULL") {
+                scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
+                    call md5.check_md5 {
+                        input: file = pair.left,
+                            md5sum = pair.right,
+                            project_id = project_id
+                    }
+                }
+
+                call md5.summarize_md5_check {
+                    input: file = select_md5_files.files_to_check,
+                        md5_check = check_md5.md5_check
                 }
             }
-
-            call md5.summarize_md5_check {
-                input: file = select_md5_files.files_to_check,
-                    md5_check = check_md5.md5_check
-            }
-        }
-
-        call select_vcf_files {
-            input: validated_table_files = val_tables
         }
 
         # can only check VCF files once tables are imported since check_vcf_samples reads tables
-        if (import_tables && select_vcf_files.files_to_check[0] != "NULL") {
-            scatter (pair in zip(select_vcf_files.files_to_check, select_vcf_files.ids_to_check)) {
-                call vcf.check_vcf_samples {
-                    input: vcf_file = pair.left,
-                        called_variants_dna_short_read_id = pair.right,
-                        workspace_name = workspace_name,
-                        workspace_namespace = workspace_namespace,
-                        disk_gb = vcf_disk_gb
-                }
+        if (check_vcf && import_tables) {
+            call select_vcf_files {
+                input: validated_table_files = val_tables
             }
 
-            call vcf.summarize_vcf_check {
-                input: file = select_vcf_files.files_to_check,
-                    vcf_check = check_vcf_samples.vcf_sample_check
+            if (select_vcf_files.files_to_check[0] != "NULL") {
+                scatter (pair in zip(select_vcf_files.files_to_check, select_vcf_files.ids_to_check)) {
+                    call vcf.check_vcf_samples {
+                        input: vcf_file = pair.left,
+                            called_variants_dna_short_read_id = pair.right,
+                            workspace_name = workspace_name,
+                            workspace_namespace = workspace_namespace,
+                            disk_gb = vcf_disk_gb
+                    }
+                }
+
+                call vcf.summarize_vcf_check {
+                    input: file = select_vcf_files.files_to_check,
+                        vcf_check = check_vcf_samples.vcf_sample_check
+                }
             }
         }
     }
