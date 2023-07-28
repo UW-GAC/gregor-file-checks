@@ -51,7 +51,7 @@ vcf_check_details | A TSV file with two columns: file_path of the file in cloud 
 
 ## check_vcf_samples
 
-This workflow checks that the samples in the header of a VCF file match the sample ids in the data model (dataset_id -> sample_set_id -> sample_id).
+This workflow checks that the samples in the header of a VCF file match the experiment sample ids in the data model (called_variants_dna_short_read_file -> aligned_dna_short_read_set_id -> aligned_dna_short_read_id -> experiment_dna_short_read_id -> experiment_sample_id).
 
 The user must specify the following inputs:
 
