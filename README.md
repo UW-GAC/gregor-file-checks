@@ -27,11 +27,13 @@ input | description
 --- | ---
 table_files | This input is of type Map[String, File], which consists of key:value pairs. Keys are table names, which should correspond to names in the data model, and values are Google bucket paths to TSV files for each table.
 model_url | A URL providing the path to the data model in JSON format.
-hash_id_nchar | Number of characters in auto-generated columns (default 16)
-import_tables | A boolean indicating whether tables should be imported to a workspace after validation.
-overwrite | A boolean indicating whether existing rows in the data tables should be overwritten.
+hash_id_nchar | Number of characters in auto-generated columns (default 16).
+import_tables | A boolean indicating whether tables should be imported to a workspace after validation (default false).
+overwrite | A boolean indicating whether existing rows in the data tables should be overwritten (default false).
 workspace_name | A string with the workspace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace name is "Terra-Workflows-Quickstart"
 workspace_namespace | A string with the workspace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace namespace is "fc-product-demo"
+check_md5 | A boolean indicating whether to check md5sums of files against provided values in the data tables (default true).
+check_vcf | A boolean indicating whether to check that vcf headers match experiment sample ids in the data tables (default true). Note this check will only be run if import_tables is also true.
 project_id | Google project id to bill for checking md5sums of files in requester_pays buckets.
 vcf_disk_gb | Disk space required for each VCF file (default 10 GB). If the job fails due to lack of disk space, try setting this to a larger value.
 
@@ -41,6 +43,10 @@ output | description
 --- | ---
 validation_report | An HTML file with validation results
 tables | A file array with the tables after adding auto-generated columns. This output is not generated if no additional columns are specified in the data model.
+md5_check_summary | A string describing the check results, e.g. "10 PASS; 1 UNVERIFIED"
+md5_check_details | A TSV file with two columns: file_path of the file in cloud storage and md5_check with the check result.
+vcf_check_summary | A string describing the check results, e.g. "5 PASS"
+vcf_check_details | A TSV file with two columns: file_path of the file in cloud storage and vcf_check with the check result.
 
 
 ## check_vcf_samples
