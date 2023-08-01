@@ -1,3 +1,4 @@
+library(tibble)
 
 participant <- tibble(
     participant_id = paste0("UW_DCC_participant_", 123:126),
@@ -110,9 +111,55 @@ aligned_rna_short_read = tibble(
     gene_annotation_details = "gencode_comprehensive_chr"
 )
 
+
+experiment_nanopore <- tibble(
+    experiment_nanopore_id = c("UW_DCC_experiment_1", "UW_DCC_experiment_2"),
+    analyte_id = c("UW_DCC_analyte_1", "UW_DCC_analyte_2"),
+    experiment_sample_id = c("H7YG5DSX2-3-IDUDI0014-1", "H7YG5DSX2-5-IDUDI0126-1"),
+    seq_library_prep_kit_method = c("Rapid kit 14", "LSK111"),
+    fragmentation_method = "Covaris g-tube",
+    experiment_type = "genome",
+    targeted_region_bed_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/LR_experiment.bed",
+    date_data_generation = "2022-06-29",
+    sequencing_platform = "Oxford Nanopore PromethION",
+    chemistry_type = "R10.4.1",
+    was_barcoded = c("TRUE", "FALSE"),
+    barcode_kit = c("BCK")
+)
+
+aligned_nanopore = tibble(
+    aligned_nanopore_id = c("UW_DCC_H7YG5DSX2-3-IDUDI0014-1", "UW_DCC_H7YG5DSX2-5-IDUDI0126-1"),
+    experiment_nanopore_id = c("UW_DCC_experiment_1", "UW_DCC_experiment_2"),
+    aligned_nanopore_file = paste0("gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_", 1:2, ".bam"),
+    aligned_nanopore_index_file = paste0("gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/experiment_", 1:2, ".bai"),
+    md5sum = c("d3b07384d113edec49eaa6238ad5ff00", "a7457a3403aa8e4616ce64bfae86655c"),
+    reference_assembly = "GRCh38",
+    alignment_software = "Minimap2-2.24",
+    mean_coverage = 100,
+    genome_coverage = 93,
+    analysis_details = "10.5281/zenodo.4469317",
+    methylation_called = TRUE
+)
+
+aligned_nanopore_set <- tibble(
+    aligned_nanopore_set_id = "UW_DCC_H7YG5DSX2-3-IDUDI0014-1",
+    aligned_nanopore_id = c("UW_DCC_H7YG5DSX2-3-IDUDI0014-1", "UW_DCC_H7YG5DSX2-5-IDUDI0126-1")
+)
+
+called_variants_nanopore <- tibble(
+    aligned_nanopore_set_id = "UW_DCC_H7YG5DSX2-3-IDUDI0014-1",
+    called_variants_dna_file = "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/variants_file.vcf",
+    md5sum = "efdf612a01049cc6e99470ad92b0326e",
+    caller_software = "sniffles-v2.0.7",
+    variant_types = "SNV|INDEL",
+    analysis_details = "10.5281/zenodo.4469317"
+)
+
+
 table_names <- c("participant", "family", "phenotype", "analyte", "experiment_dna_short_read",
     "aligned_dna_short_read", "aligned_dna_short_read_set", "called_variants_dna_short_read",
-    "experiment_rna_short_read", "aligned_rna_short_read")
+    "experiment_rna_short_read", "aligned_rna_short_read", "experiment_nanopore",
+    "aligned_nanopore", "aligned_nanopore_set", "called_variants_nanopore")
 for (t in table_names) {
     outfile <- paste0(t, ".tsv")
     readr::write_tsv(get(t), outfile)
