@@ -1,0 +1,3 @@
+experiment_nanopore_id	analyte_id	experiment_sample_id	seq_library_prep_kit_method	fragmentation_method	experiment_type	targeted_region_bed_file	date_data_generation	sequencing_platform	chemistry_type	was_barcoded	barcode_kit
+UW_DCC_experiment_1	UW_DCC_analyte_1	H7YG5DSX2-3-IDUDI0014-1	Rapid kit 14	Covaris g-tube	genome	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/LR_experiment.bed	2022-06-29	Oxford Nanopore PromethION	R10.4.1	TRUE	BCK
+UW_DCC_experiment_2	UW_DCC_analyte_2	H7YG5DSX2-5-IDUDI0126-1	LSK111	Covaris g-tube	genome	gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/LR_experiment.bed	2022-06-29	Oxford Nanopore PromethION	R10.4.1	FALSE	BCK
