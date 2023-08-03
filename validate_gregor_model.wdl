@@ -61,10 +61,12 @@ workflow validate_gregor_model {
             }
 
             if (select_vcf_files.files_to_check[0] != "NULL") {
-                scatter (pair in zip(select_vcf_files.files_to_check, select_vcf_files.ids_to_check)) {
+                scatter (pair in zip(zip(select_vcf_files.files_to_check, select_vcf_files.ids_to_check), 
+                                    select_vcf_files.types_to_check)) {
                     call vcf.check_vcf_samples {
-                        input: vcf_file = pair.left,
-                            called_variants_dna_short_read_id = pair.right,
+                        input: vcf_file = pair.left.left,
+                            id_in_table = pair.left.right,
+                            data_type = pair.right,
                             workspace_name = workspace_name,
                             workspace_namespace = workspace_namespace,
                             disk_gb = vcf_disk_gb
@@ -106,7 +108,9 @@ task select_md5_files {
         names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
         md5_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_file', \
           'called_variants_dna_short_read'='called_variants_dna_file', \
-          'aligned_rna_short_read'='aligned_rna_short_read_file'); \
+          'aligned_rna_short_read'='aligned_rna_short_read_file', \
+          'aligned_nanopore'='aligned_nanopore_file', \
+          'called_variants_nanopore'='called_variants_dna_file'); \
         tables <- tables[names(tables) %in% names(md5_cols)]; \
         files <- list(); md5 <- list();
         for (t in names(tables)) { \
@@ -144,21 +148,26 @@ task select_vcf_files {
         Rscript -e "\
         tables <- readLines('~{write_lines(validated_table_files)}'); \
         names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
-        vcf_cols <- c('called_variants_dna_short_read'='called_variants_dna_file'); \
-        id_cols <- c('called_variants_dna_short_read'='called_variants_dna_short_read_id'); \
+        vcf_cols <- c('called_variants_dna_short_read'='called_variants_dna_file', \
+            'called_variants_nanopore'='called_variants_dna_file'); \
+        id_cols <- c('called_variants_dna_short_read'='called_variants_dna_short_read_id', \
+            'called_variants_nanopore'='called_variants_nanopore_id'); \
         tables <- tables[names(tables) %in% names(vcf_cols)]; \
-        files <- list(); ids <- list(); \
+        files <- list(); ids <- list(); types <- list(); \
         for (t in names(tables)) { \
           dat <- readr::read_tsv(tables[t]); \
           files[[t]] <- dat[[vcf_cols[t]]]; \
           ids[[t]] <- dat[[id_cols[t]]]; \
+          types[[t]] <- sub('^called_variants_', '', t); \
         }; \
         if (length(files) > 0) { \
           writeLines(unlist(files), 'file.txt'); \
           writeLines(unlist(ids), 'id.txt'); \
+          writeLines(unlist(types), 'type.txt'); \
         } else { \
           writeLines('NULL', 'file.txt'); \
           writeLines('NULL', 'id.txt'); \
+          writeLines('NULL', 'type.txt'); \
         } \
         "
     >>>
@@ -166,6 +175,7 @@ task select_vcf_files {
     output {
         Array[String] files_to_check = read_lines("file.txt")
         Array[String] ids_to_check = read_lines("id.txt")
+        Array[String] types_to_check = read_lines("type.txt")
     }
 
     runtime {
