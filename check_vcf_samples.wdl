@@ -76,7 +76,7 @@ task compare_sample_sets {
         experiment_id_name <- paste0(experiment_table_name, '_id'); \
         id <- '~{id_in_table}'; \
         variants_table <- AnVIL::avtable(variants_table_name, name=workspace_name, namespace=workspace_namespace); \
-        aligned_set_id <- variants_table[[aligned_set_id_name]][variants_table[[id_name]] == id]; \
+        aligned_set_id <- variants_table[[aligned_set_id_name]][variants_table[[variants_id_name]] == id]; \
         aligned_set <- AnVIL::avtable(aligned_set_table_name, name=workspace_name, namespace=workspace_namespace); \
         aligned_reads <- aligned_set[[paste0(aligned_table_name, 's.items')]][aligned_set[[aligned_set_id_name]] == aligned_set_id][[1]][['entityName']]; \
         aligned_table <- AnVIL::avtable(aligned_table_name, name=workspace_name, namespace=workspace_namespace); \
