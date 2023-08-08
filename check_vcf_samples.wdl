@@ -3,7 +3,8 @@ version 1.0
 workflow check_vcf_samples {
     input {
         File vcf_file
-        String called_variants_dna_short_read_id
+        String data_type
+        String id_in_table
         String workspace_name
         String workspace_namespace
         Int? disk_gb
@@ -16,7 +17,8 @@ workflow check_vcf_samples {
 
     call compare_sample_sets {
         input: sample_file = vcf_samples.sample_file,
-               called_variants_dna_short_read_id = called_variants_dna_short_read_id,
+               data_type = data_type,
+               id_in_table = id_in_table,
                workspace_name = workspace_name,
                workspace_namespace = workspace_namespace
     }
@@ -54,7 +56,8 @@ task vcf_samples {
 task compare_sample_sets {
     input {
         File sample_file
-        String called_variants_dna_short_read_id
+        String data_type
+        String id_in_table
         String workspace_name
         String workspace_namespace
     }
@@ -63,15 +66,23 @@ task compare_sample_sets {
         Rscript -e "\
         workspace_name <- '~{workspace_name}'; \
         workspace_namespace <- '~{workspace_namespace}'; \
-        id <- '~{called_variants_dna_short_read_id}'; \
-        variants_table <- AnVIL::avtable('called_variants_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
-        aligned_set_id <- variants_table[['aligned_dna_short_read_set_id']][variants_table[['called_variants_dna_short_read_id']] == id]; \
-        aligned_set <- AnVIL::avtable('aligned_dna_short_read_set', name=workspace_name, namespace=workspace_namespace); \
-        aligned_reads <- aligned_set[['aligned_dna_short_reads.items']][aligned_set[['aligned_dna_short_read_set_id']] == aligned_set_id][[1]][['entityName']]; \
-        aligned_table <- AnVIL::avtable('aligned_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
-        experiments <- aligned_table[['experiment_dna_short_read_id']][aligned_table[['aligned_dna_short_read_id']] %in% aligned_reads]; \
-        experiment_table <- AnVIL::avtable('experiment_dna_short_read', name=workspace_name, namespace=workspace_namespace); \
-        if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiment_table[['experiment_sample_id']][experiment_table[['experiment_dna_short_read_id']] %in% experiments] else samples <- experiments; \
+        variants_table_name <- paste0('called_variants_', '~{data_type}'); \
+        variants_id_name <- paste0(variants_table_name, '_id'); \
+        aligned_table_name <- paste0('aligned_', '~{data_type}'); \
+        aligned_id_name <- paste0(aligned_table_name, '_id'); \
+        aligned_set_table_name <- paste0(aligned_table_name, '_set'); \
+        aligned_set_id_name <- paste0(aligned_set_table_name, '_id'); \
+        experiment_table_name <- paste0('experiment_', '~{data_type}'); \
+        experiment_id_name <- paste0(experiment_table_name, '_id'); \
+        id <- '~{id_in_table}'; \
+        variants_table <- AnVIL::avtable(variants_table_name, name=workspace_name, namespace=workspace_namespace); \
+        aligned_set_id <- variants_table[[aligned_set_id_name]][variants_table[[variants_id_name]] == id]; \
+        aligned_set <- AnVIL::avtable(aligned_set_table_name, name=workspace_name, namespace=workspace_namespace); \
+        aligned_reads <- aligned_set[[paste0(aligned_table_name, 's.items')]][aligned_set[[aligned_set_id_name]] == aligned_set_id][[1]][['entityName']]; \
+        aligned_table <- AnVIL::avtable(aligned_table_name, name=workspace_name, namespace=workspace_namespace); \
+        experiments <- aligned_table[[experiment_id_name]][aligned_table[[aligned_id_name]] %in% aligned_reads]; \
+        experiment_table <- AnVIL::avtable(experiment_table_name, name=workspace_name, namespace=workspace_namespace); \
+        if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiment_table[['experiment_sample_id']][experiment_table[[experiment_id_name]] %in% experiments] else samples <- experiments; \
         writeLines(as.character(samples), 'workspace_samples.txt'); \
         vcf_samples <- readLines('~{sample_file}'); \
         if (setequal(samples, vcf_samples)) status <- 'PASS' else status <- 'FAIL'; \
@@ -86,7 +97,7 @@ task compare_sample_sets {
     }
 
     runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
     }
 }
 
@@ -115,6 +126,6 @@ task summarize_vcf_check {
     }
 
     runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.16.0"
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
     }
 }
