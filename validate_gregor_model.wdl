@@ -158,7 +158,7 @@ task select_vcf_files {
           dat <- readr::read_tsv(tables[t]); \
           files[[t]] <- dat[[vcf_cols[t]]]; \
           ids[[t]] <- dat[[id_cols[t]]]; \
-          types[[t]] <- sub('^called_variants_', '', t); \
+          types[[t]] <- rep(sub('^called_variants_', '', t), nrow(dat)); \
         }; \
         if (length(files) > 0) { \
           writeLines(unlist(files), 'file.txt'); \
