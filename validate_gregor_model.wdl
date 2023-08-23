@@ -19,7 +19,7 @@ workflow validate_gregor_model {
         String? project_id
     }
 
-    call validate.validate_data_model {
+    call validate.validate {
         input: table_files = table_files,
                model_url = model_url,
                hash_id_nchar = hash_id_nchar,
@@ -29,10 +29,10 @@ workflow validate_gregor_model {
                import_tables = import_tables
     }
 
-    # need this because validate_data_model.tables is optional but input to select_md5_files is required
-    Array[File] val_tables = select_first([validate_data_model.tables, ""])
+    # need this because validate.tables is optional but input to select_md5_files is required
+    Array[File] val_tables = select_first([validate.tables, ""])
 
-    if (defined(validate_data_model.tables)) {
+    if (defined(validate.tables)) {
         if (check_md5) {
             call select_md5_files {
                 input: validated_table_files = val_tables
@@ -82,8 +82,8 @@ workflow validate_gregor_model {
     }
 
     output {
-        File validation_report = validate_data_model.validation_report
-        Array[File]? tables = validate_data_model.tables
+        File validation_report = validate.validation_report
+        Array[File]? tables = validate.tables
         String? md5_check_summary = summarize_md5_check.summary
         File? md5_check_details = summarize_md5_check.details
         String? vcf_check_summary = summarize_vcf_check.summary
