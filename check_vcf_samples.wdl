@@ -7,8 +7,9 @@ workflow check_vcf_samples {
         String id_in_table
         String workspace_name
         String workspace_namespace
-        Int? disk_gb
     }
+
+    Int disk_gb = ceil(size(vcf_file, "GB")*1.5)
 
     call vcf_samples {
         input: vcf_file = vcf_file,

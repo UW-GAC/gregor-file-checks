@@ -17,7 +17,6 @@ workflow validate_gregor_model {
         Boolean check_vcf = true
         Boolean check_bam = false
         Int? hash_id_nchar
-        Int? vcf_disk_gb
         String? project_id
     }
 
@@ -70,8 +69,7 @@ workflow validate_gregor_model {
                             id_in_table = pair.left.right,
                             data_type = pair.right,
                             workspace_name = workspace_name,
-                            workspace_namespace = workspace_namespace,
-                            disk_gb = vcf_disk_gb
+                            workspace_namespace = workspace_namespace
                     }
                 }
 

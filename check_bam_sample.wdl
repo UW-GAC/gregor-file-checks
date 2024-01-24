@@ -11,7 +11,7 @@ workflow check_bam_sample {
         String workspace_namespace
     }
 
-    Int disk_gb = ceil(size(bam_file, "GiB")*3) + 20
+    Int disk_gb = ceil(size(bam_file, "GB")*1.5)
 
     call tasks.SamtoolsView {
         input: input_bam = bam_file,
