@@ -13,6 +13,6 @@ workflows:
    - name: ExtractHeader
      subclass: WDL
      primaryDescriptorPath: /ExtractHeader.1.wdl
-   - name: check_bam_samples
+   - name: check_bam_sample
      subclass: WDL
-     primaryDescriptorPath: /check_bam_samples.wdl
+     primaryDescriptorPath: /check_bam_sample.wdl
