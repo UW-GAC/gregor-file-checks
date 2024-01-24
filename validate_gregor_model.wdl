@@ -3,6 +3,7 @@ version 1.0
 import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/validate_data_model.wdl" as validate
 import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/check_md5.wdl" as md5
 import "check_vcf_samples.wdl" as vcf
+import "check_bam_sample.wdl" as bam
 
 workflow validate_gregor_model {
     input {
@@ -14,6 +15,7 @@ workflow validate_gregor_model {
         Boolean import_tables = false
         Boolean check_md5 = true
         Boolean check_vcf = true
+        Boolean check_bam = false
         Int? hash_id_nchar
         Int? vcf_disk_gb
         String? project_id
@@ -79,6 +81,30 @@ workflow validate_gregor_model {
                 }
             }
         }
+
+        if (check_bam && import_tables) {
+            call select_bam_files {
+                input: validated_table_files = val_tables
+            }
+
+            if (select_bam_files.files_to_check[0] != "NULL") {
+                scatter (pair in zip(zip(select_bam_files.files_to_check, select_bam_files.ids_to_check), 
+                                    select_bam_files.types_to_check)) {
+                    call bam.check_bam_sample {
+                        input: bam_file = pair.left.left,
+                            id_in_table = pair.left.right,
+                            data_type = pair.right,
+                            workspace_name = workspace_name,
+                            workspace_namespace = workspace_namespace
+                    }
+                }
+
+                call bam.summarize_bam_check {
+                    input: file = select_bam_files.files_to_check,
+                        bam_check = check_bam_sample.bam_sample_check
+                }
+            }
+        }
     }
 
     output {
@@ -88,6 +114,8 @@ workflow validate_gregor_model {
         File? md5_check_details = summarize_md5_check.details
         String? vcf_check_summary = summarize_vcf_check.summary
         File? vcf_check_details = summarize_vcf_check.details
+        String? bam_check_summary = summarize_bam_check.summary
+        File? bam_check_details = summarize_bam_check.details
     }
 
      meta {
@@ -189,3 +217,53 @@ task select_vcf_files {
     }
 }
 
+
+task select_bam_files {
+    input {
+        Array[File] validated_table_files
+    }
+
+    command <<<
+        Rscript -e "\
+        tables <- readLines('~{write_lines(validated_table_files)}'); \
+        names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
+        bam_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_file', \
+          'aligned_rna_short_read'='aligned_rna_short_read_file', \
+          'aligned_nanopore'='aligned_nanopore_file', \
+          'aligned_pac_bio'='aligned_pac_bio_file', \
+          'aligned_atac_short_read'='aligned_atac_short_read_file); \
+        id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id', \
+          'aligned_rna_short_read'='aligned_rna_short_read_id', \
+          'aligned_nanopore'='aligned_nanopore_id', \
+          'aligned_pac_bio'='aligned_pac_bio_id', \
+          'aligned_atac_short_read'='aligned_atac_short_read_id); \
+        tables <- tables[names(tables) %in% names(bam_cols)]; \
+        files <- list(); ids <- list(); types <- list(); \
+        for (t in names(tables)) { \
+          dat <- readr::read_tsv(tables[t]); \
+          files[[t]] <- dat[[bam_cols[t]]]; \
+          ids[[t]] <- dat[[id_cols[t]]]; \
+          types[[t]] <- rep(sub('^aligned_', '', t), nrow(dat)); \
+        }; \
+        if (length(files) > 0) { \
+          writeLines(unlist(files), 'file.txt'); \
+          writeLines(unlist(ids), 'id.txt'); \
+          writeLines(unlist(types), 'type.txt'); \
+        } else { \
+          writeLines('NULL', 'file.txt'); \
+          writeLines('NULL', 'id.txt'); \
+          writeLines('NULL', 'type.txt'); \
+        } \
+        "
+    >>>
+
+    output {
+        Array[String] files_to_check = read_lines("file.txt")
+        Array[String] ids_to_check = read_lines("id.txt")
+        Array[String] types_to_check = read_lines("type.txt")
+    }
+
+    runtime {
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
+    }
+}
