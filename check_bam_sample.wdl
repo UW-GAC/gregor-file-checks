@@ -76,7 +76,7 @@ task compare_samples {
 
     output {
         String check_status = read_string("status.txt")
-        File workspace_sample = "workspace_samples.txt"
+        File workspace_sample = "workspace_sample.txt"
         File bam_sample = "bam_sample.txt"
     }
 
