@@ -229,12 +229,12 @@ task select_bam_files {
           'aligned_rna_short_read'='aligned_rna_short_read_file', \
           'aligned_nanopore'='aligned_nanopore_file', \
           'aligned_pac_bio'='aligned_pac_bio_file', \
-          'aligned_atac_short_read'='aligned_atac_short_read_file); \
+          'aligned_atac_short_read'='aligned_atac_short_read_file'); \
         id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id', \
           'aligned_rna_short_read'='aligned_rna_short_read_id', \
           'aligned_nanopore'='aligned_nanopore_id', \
           'aligned_pac_bio'='aligned_pac_bio_id', \
-          'aligned_atac_short_read'='aligned_atac_short_read_id); \
+          'aligned_atac_short_read'='aligned_atac_short_read_id'); \
         tables <- tables[names(tables) %in% names(bam_cols)]; \
         files <- list(); ids <- list(); types <- list(); \
         for (t in names(tables)) { \
