@@ -10,3 +10,9 @@ workflows:
      primaryDescriptorPath: /check_vcf_samples.wdl
      testParameterFiles:
          - /check_vcf_samples.json
+   - name: ExtractHeader
+     subclass: WDL
+     primaryDescriptorPath: /ExtractHeader.1.wdl
+   - name: check_bam_sample
+     subclass: WDL
+     primaryDescriptorPath: /check_bam_sample.wdl
