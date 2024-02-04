@@ -34,8 +34,8 @@ workspace_name | A string with the workspace name. e.g, if the workspace URL is 
 workspace_namespace | A string with the workspace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace namespace is "fc-product-demo"
 check_md5 | A boolean indicating whether to check md5sums of files against provided values in the data tables (default true).
 check_vcf | A boolean indicating whether to check that vcf headers match experiment sample ids in the data tables (default true). Note this check will only be run if import_tables is also true.
+check_bam | A boolean indicating whether to check that bam headers match experiment sample ids in the data tables (default false). Note this check will only be run if import_tables is also true.
 project_id | Google project id to bill for checking md5sums of files in requester_pays buckets.
-vcf_disk_gb | Disk space required for each VCF file (default 10 GB). If the job fails due to lack of disk space, try setting this to a larger value.
 
 The workflow returns the following outputs:
 
@@ -47,6 +47,8 @@ md5_check_summary | A string describing the check results, e.g. "10 PASS; 1 UNVE
 md5_check_details | A TSV file with two columns: file_path of the file in cloud storage and md5_check with the check result.
 vcf_check_summary | A string describing the check results, e.g. "5 PASS"
 vcf_check_details | A TSV file with two columns: file_path of the file in cloud storage and vcf_check with the check result.
+bam_check_summary | A string describing the check results, e.g. "5 PASS"
+bam_check_details | A TSV file with two columns: file_path of the file in cloud storage and bam_check with the check result.
 
 
 ## check_vcf_samples
@@ -58,13 +60,34 @@ The user must specify the following inputs:
 input | description
 --- | ---
 vcf_file | Google bucket path to a VCF file
-called_variants_dna_short_read_id | The id associated with the vcf_file
+data_type | The data type of the VCF file (e.g. dna_short_read)
+id_in_table | The id associated with the vcf_file
 workspace_name | A string with the workpsace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace name is "Terra-Workflows-Quickstart"
 workspace_namespace | A string with the workpsace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace namespace is "fc-product-demo"
-disk_gb | Disk space required for the VCF file (default 10 GB). If the job fails due to lack of disk space, try setting this to a larger value.
 
 The workflow returns the following outputs:
 
 output | description
 --- | ---
 vcf_sample_check | "PASS" or "FAIL" indicating whether the VCF sample ids match the sample_set in the workspace data tables
+
+
+## check_bam_sample
+
+This workflow checks that the SM tag in the header of a BAM or CRAM file matches the experiment sample ids in the data model (aligned_dna_short_read_set_id -> aligned_dna_short_read_id -> experiment_dna_short_read_id -> experiment_sample_id).
+
+The user must specify the following inputs:
+
+input | description
+--- | ---
+bam_file | Google bucket path to a BAM or CRAM file
+data_type | The data type of the BAM files (e.g. dna_short_read)
+id_in_table | The id associated with the bam_file
+workspace_name | A string with the workpsace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace name is "Terra-Workflows-Quickstart"
+workspace_namespace | A string with the workpsace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace namespace is "fc-product-demo"
+
+The workflow returns the following outputs:
+
+output | description
+--- | ---
+bam_sample_check | "PASS" or "FAIL" indicating whether the BAM sample id matches the experiment_sample_id in the workspace data tables
