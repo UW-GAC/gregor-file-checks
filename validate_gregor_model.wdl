@@ -148,7 +148,7 @@ task select_md5_files {
           files[[t]] <- dat[[md5_cols[t]]]; \
           md5[[t]] <- dat[['md5sum']]; \
         }; \
-        if (length(files) > 0) { \
+        if (length(unlist(files)) > 0) { \
           writeLines(unlist(files), 'file.txt'); \
           writeLines(unlist(md5), 'md5sum.txt'); \
         } else { \
@@ -192,7 +192,7 @@ task select_vcf_files {
           ids[[t]] <- dat[[id_cols[t]]]; \
           types[[t]] <- rep(sub('^called_variants_', '', t), nrow(dat)); \
         }; \
-        if (length(files) > 0) { \
+        if (length(unlist(files)) > 0) { \
           writeLines(unlist(files), 'file.txt'); \
           writeLines(unlist(ids), 'id.txt'); \
           writeLines(unlist(types), 'type.txt'); \
