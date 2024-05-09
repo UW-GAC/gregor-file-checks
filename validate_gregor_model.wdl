@@ -13,6 +13,7 @@ workflow validate_gregor_model {
         String workspace_namespace
         Boolean overwrite = false
         Boolean import_tables = false
+        Boolean check_bucket_paths = true
         Boolean check_md5 = true
         Boolean check_vcf = true
         Boolean check_bam = false
@@ -27,7 +28,8 @@ workflow validate_gregor_model {
                workspace_name = workspace_name,
                workspace_namespace = workspace_namespace,
                overwrite = overwrite,
-               import_tables = import_tables
+               import_tables = import_tables,
+               check_bucket_paths = check_bucket_paths
     }
 
     # need this because validate.tables is optional but input to select_md5_files is required

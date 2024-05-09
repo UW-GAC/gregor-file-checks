@@ -32,6 +32,7 @@ import_tables | A boolean indicating whether tables should be imported to a work
 overwrite | A boolean indicating whether existing rows in the data tables should be overwritten (default false).
 workspace_name | A string with the workspace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace name is "Terra-Workflows-Quickstart"
 workspace_namespace | A string with the workspace name. e.g, if the workspace URL is https://anvil.terra.bio/#workspaces/fc-product-demo/Terra-Workflows-Quickstart, the workspace namespace is "fc-product-demo"
+check_bucket_paths | A boolean indicating whether to check the existence of bucket paths in the data tables (default true).
 check_md5 | A boolean indicating whether to check md5sums of files against provided values in the data tables (default true).
 check_vcf | A boolean indicating whether to check that vcf headers match experiment sample ids in the data tables (default true). Note this check will only be run if import_tables is also true.
 check_bam | A boolean indicating whether to check that bam headers match experiment sample ids in the data tables (default false). Note this check will only be run if import_tables is also true.
