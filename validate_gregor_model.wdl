@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/0.5.1/validate_data_model.wdl" as validate
+import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/validate_data_model.wdl" as validate
 import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/check_md5.wdl" as md5
 import "check_vcf_samples.wdl" as vcf
 import "check_bam_sample.wdl" as bam
