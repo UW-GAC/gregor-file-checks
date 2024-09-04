@@ -160,7 +160,7 @@ task select_md5_files {
           'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_id', \
           'called_variants_optical_mapping'='called_variants_optical_mapping_id'); \
         tables <- tables[names(tables) %in% names(md5_cols)]; \
-        files <- list(); md5 <- list();
+        files <- list(); md5 <- list(); ids <- list(); \
         for (t in names(tables)) { \
           dat <- readr::read_tsv(tables[t]); \
           files[[t]] <- dat[[md5_cols[t]]]; \
