@@ -143,7 +143,10 @@ task select_md5_files {
           'aligned_pac_bio'='aligned_pac_bio_file', \
           'called_variants_pac_bio'='called_variants_dna_file', \
           'aligned_atac_short_read'='aligned_atac_short_read_file', \
-          'called_peaks_atac_short_read'='called_peaks_file'); \
+          'called_peaks_atac_short_read'='called_peaks_file', \
+          'molecule_file_optical_mapping'='bnx_file', \
+          'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_file', \
+          'called_variants_optical_mapping'='optical_mapping_vcf_file'); \
         id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id', \
           'called_variants_dna_short_read'='called_variants_dna_short_read_id', \
           'aligned_rna_short_read'='aligned_rna_short_read_id', \
@@ -152,7 +155,10 @@ task select_md5_files {
           'aligned_pac_bio'='aligned_pac_bio_id', \
           'called_variants_pac_bio'='called_variants_pac_bio_id', \
           'aligned_atac_short_read'='aligned_atac_short_read_id', \
-          'called_peaks_atac_short_read'='called_peaks_atac_short_read_id'); \
+          'called_peaks_atac_short_read'='called_peaks_atac_short_read_id', \
+          'molecule_file_optical_mapping'='molecule_file_optical_mapping_id', \
+          'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_id', \
+          'called_variants_optical_mapping'='called_variants_optical_mapping_id'); \
         tables <- tables[names(tables) %in% names(md5_cols)]; \
         files <- list(); md5 <- list();
         for (t in names(tables)) { \
@@ -196,10 +202,12 @@ task select_vcf_files {
         names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
         vcf_cols <- c('called_variants_dna_short_read'='called_variants_dna_file', \
             'called_variants_nanopore'='called_variants_dna_file',
-            'called_variants_pac_bio'='called_variants_dna_file'); \
+            'called_variants_pac_bio'='called_variants_dna_file', \
+            'called_variants_optical_mapping'='optical_mapping_vcf_file'); \
         id_cols <- c('called_variants_dna_short_read'='called_variants_dna_short_read_id', \
             'called_variants_nanopore'='called_variants_nanopore_id', \
-            'called_variants_pac_bio'='called_variants_pac_bio_id'); \
+            'called_variants_pac_bio'='called_variants_pac_bio_id', \
+            'called_variants_optical_mapping'='called_variants_optical_mapping_id'); \
         tables <- tables[names(tables) %in% names(vcf_cols)]; \
         files <- list(); ids <- list(); types <- list(); \
         for (t in names(tables)) { \
@@ -245,12 +253,14 @@ task select_bam_files {
           'aligned_rna_short_read'='aligned_rna_short_read_file', \
           'aligned_nanopore'='aligned_nanopore_file', \
           'aligned_pac_bio'='aligned_pac_bio_file', \
-          'aligned_atac_short_read'='aligned_atac_short_read_file'); \
+          'aligned_atac_short_read'='aligned_atac_short_read_file', \
+          'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_file'); \
         id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id', \
           'aligned_rna_short_read'='aligned_rna_short_read_id', \
           'aligned_nanopore'='aligned_nanopore_id', \
           'aligned_pac_bio'='aligned_pac_bio_id', \
-          'aligned_atac_short_read'='aligned_atac_short_read_id'); \
+          'aligned_atac_short_read'='aligned_atac_short_read_id', \
+          'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_id'); \
         tables <- tables[names(tables) %in% names(bam_cols)]; \
         files <- list(); ids <- list(); types <- list(); \
         for (t in names(tables)) { \
