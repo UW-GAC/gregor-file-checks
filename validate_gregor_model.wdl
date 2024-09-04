@@ -1,7 +1,7 @@
 version 1.0
 
 import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/validate_data_model.wdl" as validate
-import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/check_md5.wdl" as md5
+import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/md5_check_ids/check_md5.wdl" as md5
 import "check_vcf_samples.wdl" as vcf
 import "check_bam_sample.wdl" as bam
 
@@ -52,7 +52,8 @@ workflow validate_gregor_model {
 
                 call md5.summarize_md5_check {
                     input: file = select_md5_files.files_to_check,
-                        md5_check = md5check.md5_check
+                        md5_check = md5check.md5_check,
+                        id = select_md5_files.ids_to_check
                 }
             }
         }
@@ -140,22 +141,34 @@ task select_md5_files {
           'aligned_nanopore'='aligned_nanopore_file', \
           'called_variants_nanopore'='called_variants_dna_file', \
           'aligned_pac_bio'='aligned_pac_bio_file', \
-          'called_variants_pac_bio'='called_variants_dna_file',
+          'called_variants_pac_bio'='called_variants_dna_file', \
           'aligned_atac_short_read'='aligned_atac_short_read_file', \
           'called_peaks_atac_short_read'='called_peaks_file'); \
+        id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id', \
+          'called_variants_dna_short_read'='called_variants_dna_short_read_id', \
+          'aligned_rna_short_read'='aligned_rna_short_read_id', \
+          'aligned_nanopore'='aligned_nanopore_id', \
+          'called_variants_nanopore'='called_variants_dna_short_read_id', \
+          'aligned_pac_bio'='aligned_pac_bio_id', \
+          'called_variants_pac_bio'='called_variants_pac_bio_id', \
+          'aligned_atac_short_read'='aligned_atac_short_read_id', \
+          'called_peaks_atac_short_read'='called_peaks_atac_short_read_id'); \
         tables <- tables[names(tables) %in% names(md5_cols)]; \
         files <- list(); md5 <- list();
         for (t in names(tables)) { \
           dat <- readr::read_tsv(tables[t]); \
           files[[t]] <- dat[[md5_cols[t]]]; \
           md5[[t]] <- dat[['md5sum']]; \
+          ids[[t]] <- dat[[id_cols[t]]]; \
         }; \
         if (length(unlist(files)) > 0) { \
           writeLines(unlist(files), 'file.txt'); \
           writeLines(unlist(md5), 'md5sum.txt'); \
+          writeLines(unlist(ids), 'id.txt'); \
         } else { \
           writeLines('NULL', 'file.txt'); \
           writeLines('NULL', 'md5sum.txt'); \
+          writeLines('NULL', 'id.txt'); \
         } \
         "
     >>>
@@ -163,6 +176,7 @@ task select_md5_files {
     output {
         Array[String] files_to_check = read_lines("file.txt")
         Array[String] md5sum_to_check = read_lines("md5sum.txt")
+        Array[String] ids_to_check = read_lines("id.txt")
     }
 
     runtime {
