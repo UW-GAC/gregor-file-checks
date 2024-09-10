@@ -151,7 +151,7 @@ task select_md5_files {
           'called_variants_dna_short_read'='called_variants_dna_short_read_id', \
           'aligned_rna_short_read'='aligned_rna_short_read_id', \
           'aligned_nanopore'='aligned_nanopore_id', \
-          'called_variants_nanopore'='called_variants_dna_short_read_id', \
+          'called_variants_nanopore'='called_variants_nanopore_id', \
           'aligned_pac_bio'='aligned_pac_bio_id', \
           'called_variants_pac_bio'='called_variants_pac_bio_id', \
           'aligned_atac_short_read'='aligned_atac_short_read_id', \
