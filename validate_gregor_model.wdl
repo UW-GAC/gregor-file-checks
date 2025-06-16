@@ -138,6 +138,7 @@ task select_md5_files {
         md5_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_file', \
           'called_variants_dna_short_read'='called_variants_dna_file', \
           'aligned_rna_short_read'='aligned_rna_short_read_file', \
+          'readcounts_rna_short_read'='readcounts_rna_file', \
           'aligned_nanopore'='aligned_nanopore_file', \
           'called_variants_nanopore'='called_variants_dna_file', \
           'aligned_pac_bio'='aligned_pac_bio_file', \
@@ -146,10 +147,15 @@ task select_md5_files {
           'called_peaks_atac_short_read'='called_peaks_file', \
           'molecule_file_optical_mapping'='bnx_file', \
           'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_file', \
-          'called_variants_optical_mapping'='optical_mapping_vcf_file'); \
+          'called_variants_optical_mapping'='optical_mapping_vcf_file', \
+          'mass_spectra_metabolomics'='mass_spectra_file', \
+          'preprocessed_file_metabolomics'='preprocessed_file', \
+          'processed_file_metabolomics'='processed_file', \
+          'harmonized_file_metabolomics'='harmonized_file'); \
         id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id', \
           'called_variants_dna_short_read'='called_variants_dna_short_read_id', \
           'aligned_rna_short_read'='aligned_rna_short_read_id', \
+          'readcounts_rna_short_read'='readcounts_rna_short_read_id', \
           'aligned_nanopore'='aligned_nanopore_id', \
           'called_variants_nanopore'='called_variants_nanopore_id', \
           'aligned_pac_bio'='aligned_pac_bio_id', \
@@ -158,7 +164,11 @@ task select_md5_files {
           'called_peaks_atac_short_read'='called_peaks_atac_short_read_id', \
           'molecule_file_optical_mapping'='molecule_file_optical_mapping_id', \
           'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_id', \
-          'called_variants_optical_mapping'='called_variants_optical_mapping_id'); \
+          'called_variants_optical_mapping'='called_variants_optical_mapping_id', \
+          'mass_spectra_metabolomics'='mass_spectra_metabolomics_id', \
+          'preprocessed_file_metabolomics'='preprocessed_file_metabolomics_id', \
+          'processed_file_metabolomics'='processed_file_metabolomics_id', \
+          'harmonized_file_metabolomics'='harmonized_file_metabolomics_id'); \
         tables <- tables[names(tables) %in% names(md5_cols)]; \
         files <- list(); md5 <- list(); ids <- list(); \
         for (t in names(tables)) { \
