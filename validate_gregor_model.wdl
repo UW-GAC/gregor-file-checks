@@ -124,6 +124,7 @@ workflow validate_gregor_model {
         File? vcf_check_details = summarize_vcf_check.details
         String? bam_check_summary = summarize_bam_check.summary
         File? bam_check_details = summarize_bam_check.details
+        File? phenotype_terms_check = check_term_id.phenotype_terms_check
     }
 
      meta {
@@ -163,8 +164,8 @@ task check_term_id {
                     filter(!match_term(ontology, term_id)) %>%
                     select(phenotype_id, participant_id, ontology, term_id)
                 write_tsv(mismatches, 'term_id_errors.tsv')
-                if (nrow(mismatches) == 0) status <- 'PASS' else status <- 'FAIL'; \
-                cat(status, file='status.txt'); \
+                if (nrow(mismatches) == 0) status <- 'PASS' else status <- 'FAIL'
+                cat(status, file='status.txt')
                 if (status == 'FAIL') stop('Phenotype term IDs do not match expected formats; see term_id_errors.tsv for details')
             } else {
                 writeLines('No phenotype table found, skipping check', 'status.txt')
