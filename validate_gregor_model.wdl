@@ -17,6 +17,7 @@ workflow validate_gregor_model {
         Boolean check_md5 = true
         Boolean check_vcf = true
         Boolean check_bam = false
+        Boolean check_phenotype_terms = true
         Int? hash_id_nchar
         String? project_id
     }
@@ -36,6 +37,12 @@ workflow validate_gregor_model {
     Array[File] val_tables = select_first([validate.tables, ""])
 
     if (defined(validate.tables)) {
+        if (check_phenotype_terms) {
+            call check_term_id {
+                input: validated_table_files = val_tables
+            }
+        }
+
         if (check_md5) {
             call select_md5_files {
                 input: validated_table_files = val_tables
@@ -117,11 +124,63 @@ workflow validate_gregor_model {
         File? vcf_check_details = summarize_vcf_check.details
         String? bam_check_summary = summarize_bam_check.summary
         File? bam_check_details = summarize_bam_check.details
+        File? phenotype_terms_check = check_term_id.phenotype_terms_check
     }
 
      meta {
           author: "Stephanie Gogarten"
           email: "sdmorris@uw.edu"
+    }
+}
+
+
+task check_term_id {
+    input {
+        Array[File] validated_table_files
+    }
+
+    command <<<
+        R << RSCRIPT
+            library(tidyverse)
+
+            match_term <- function(ontology, term) {
+                patterns <- c(
+                    "HPO" = "^HP:[0-9]{7}$",
+                    "MONDO" = "^MONDO:[0-9]{7}$",
+                    "OMIM" = "^OMIM:[0-9]{6}$",
+                    "ORPHANET" = "^ORPHA:[0-9]+$",
+                    "SNOMED" = "^SCTID:[0-9]+$",
+                    "ICD10" = "^[A-Z][0-9]{2}([.][0-9]+)?$"
+                )
+                str_detect(term, patterns[ontology])
+            }
+
+            tables <- readLines('~{write_lines(validated_table_files)}')
+            phenotype_file <- tables[str_detect(tables, 'phenotype')]
+            if (length(phenotype_file) > 0) {
+                phen <- read_tsv(phenotype_file) %>%
+                    select(phenotype_id, participant_id, ontology, term_id)
+                mismatches <- phen %>%
+                    filter(!match_term(ontology, term_id)) %>%
+                    select(phenotype_id, participant_id, ontology, term_id)
+                write_tsv(mismatches, 'term_id_errors.tsv')
+                if (nrow(mismatches) == 0) status <- 'PASS' else status <- 'FAIL'
+                cat(status, file='status.txt')
+                if (status == 'FAIL') stop('Phenotype term IDs do not match expected formats; see term_id_errors.tsv for details')
+            } else {
+                writeLines('No phenotype table found, skipping check', 'status.txt')
+                writeLines('', 'term_id_errors.tsv')
+            }
+        RSCRIPT
+    >>>
+
+    output {
+        String check_status = read_string("status.txt")
+        File phenotype_terms_check = "term_id_errors.tsv"
+    }
+
+    runtime {
+        docker: "rocker/tidyverse:4"
     }
 }
 
