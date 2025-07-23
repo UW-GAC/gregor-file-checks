@@ -17,7 +17,7 @@ workflow validate_gregor_model {
         Boolean check_md5 = true
         Boolean check_vcf = true
         Boolean check_bam = false
-        Boolean check_phenotype_terms = false
+        Boolean check_phenotype_terms = true
         Int? hash_id_nchar
         String? project_id
     }
