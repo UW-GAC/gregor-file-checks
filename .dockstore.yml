@@ -16,3 +16,6 @@ workflows:
    - name: check_bam_sample
      subclass: WDL
      primaryDescriptorPath: /check_bam_sample.wdl
+   - name: validate_md5
+     subclass: WDL
+     primaryDescriptorPath: /validate_md5.wdl
