@@ -99,7 +99,7 @@ task check_md5 {
         library(tidyverse)
         md5 <- function(f) {
             chk <- AnVIL::gsutil_stat(f) %>%
-                select(`Hash (md5)`) %>%
+                select(contains("md5")) %>%
                 unlist()
             print(chk)
             writeLines(as.character(chk), "md5_b64.txt")
