@@ -98,13 +98,15 @@ task check_md5 {
         R << RSCRIPT
         library(tidyverse)
         md5 <- function(f) {
-            AnVIL::gsutil_stat(f) %>%
+            chk <- AnVIL::gsutil_stat(f) %>%
                 select(`Hash (md5)`) %>%
-                unlist() %>%
-                writeLines("md5_b64.txt")
+                unlist()
+            print(chk)
+            writeLines(as.character(chk), "md5_b64.txt")
             system("python3 -c \"import base64; import binascii; print(binascii.hexlify(base64.urlsafe_b64decode(open('md5_b64.txt').read())))\" | cut -d \"'\" -f 2 > md5_hex.txt")
             hex <- readLines("md5_hex.txt")
             file.remove(c("md5_hex.txt", "md5_b64.txt"))
+            print(hex)
             return(hex)
         }
         tbl <- read_tsv("~{data_table}") %>%
@@ -112,7 +114,7 @@ task check_md5 {
             rowwise() %>%
             mutate(md5_metadata = md5(~{file_column}))
         tbl <- tbl %>%
-            mutate(status = ifelse(is.na(md5_metadata), "UNVERIFIED",
+            mutate(status = ifelse(md5_metadata == "", "UNVERIFIED",
                                  ifelse(md5_metadata == ~{md5_column}, "PASS", "FAIL")))
         write_tsv(tbl, "md5_check.txt")
         status <- if (all(tbl$status == "PASS")) "PASS" else "FAIL"
