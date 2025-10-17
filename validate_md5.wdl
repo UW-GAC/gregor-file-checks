@@ -108,7 +108,7 @@ task check_md5 {
             return(hex)
         }
         tbl <- read_tsv("~{data_table}") %>%
-            select(~{id_column}, ~{file_column}. ~{md5_column}) %>%
+            select(~{id_column}, ~{file_column}, ~{md5_column}) %>%
             rowwise() %>%
             mutate(md5_metadata = md5(file_path))
         tbl <- tbl %>%
