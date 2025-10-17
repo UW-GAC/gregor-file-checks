@@ -110,7 +110,7 @@ task check_md5 {
         tbl <- read_tsv("~{data_table}") %>%
             select(~{id_column}, ~{file_column}, ~{md5_column}) %>%
             rowwise() %>%
-            mutate(md5_metadata = md5(file_path))
+            mutate(md5_metadata = md5(~{file_column}))
         tbl <- tbl %>%
             mutate(status = ifelse(is.na(md5_metadata), "UNVERIFIED",
                                  ifelse(md5_metadata == ~{md5_column}, "PASS", "FAIL")))
