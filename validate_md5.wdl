@@ -98,7 +98,7 @@ task check_md5 {
         R << RSCRIPT
         library(tidyverse)
         md5 <- function(f) {
-            AnVILGCP::gsutil_stat(f) %>%
+            AnVIL::gsutil_stat(f) %>%
                 select(`Hash (md5)`) %>%
                 unlist() %>%
                 writeLines("md5_b64.txt")
