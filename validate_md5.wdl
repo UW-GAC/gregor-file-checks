@@ -101,8 +101,9 @@ task check_md5 {
             chk <- AnVIL::gsutil_stat(f) %>%
                 select(contains("md5")) %>%
                 unlist()
+            if (is.null(chk)) chk <- ""
             print(chk)
-            writeLines(as.character(chk), "md5_b64.txt")
+            writeLines(chk, "md5_b64.txt")
             system("python3 -c \"import base64; import binascii; print(binascii.hexlify(base64.urlsafe_b64decode(open('md5_b64.txt').read())))\" | cut -d \"'\" -f 2 > md5_hex.txt")
             hex <- readLines("md5_hex.txt")
             file.remove(c("md5_hex.txt", "md5_b64.txt"))
