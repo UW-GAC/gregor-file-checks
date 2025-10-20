@@ -29,7 +29,8 @@ jobs:
           ./ExtractHeader.1.wdl,
           ./check_bam_sample.wdl,
           ./validate_gregor_model.wdl,
-          ./check_vcf_samples.wdl
+          ./check_vcf_samples.wdl,
+          ./validate_md5.wdl
         ]
 
     name: "Run womtool: ${{ matrix.wdl-file }}"

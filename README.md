@@ -93,3 +93,22 @@ The workflow returns the following outputs:
 output | description
 --- | ---
 bam_sample_check | "PASS" or "FAIL" indicating whether the BAM sample id matches the experiment_sample_id in the workspace data tables
+
+
+## validate_md5
+
+This workflow checks all the md5sums in a data table against the metadata in google cloud storage.
+
+The user must specify the following inputs:
+
+input | description
+--- | ---
+data_table | File with a data table in TSV format
+table_name | String with the name of the data table (must match the GREGoR data model)
+
+The workflow returns the following outputs:
+
+output | description
+--- | ---
+md5_check | TSV file with results of the check: original md5sum, metadata md5sum, and "PASS" or "FAIL" indicating if they match
+md5_check_status | String "PASS" or "FAIL" giving a summary of results for the entire table. "PASS" if all files in the table passed; "FAIL" otherwise.
