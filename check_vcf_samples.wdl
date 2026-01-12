@@ -7,6 +7,7 @@ workflow check_vcf_samples {
         String id_in_table
         String workspace_name
         String workspace_namespace
+        Boolean stop_on_fail = true
     }
 
     Int disk_gb = ceil(size(vcf_file, "GB")*1.5) + 5
@@ -21,7 +22,8 @@ workflow check_vcf_samples {
                data_type = data_type,
                id_in_table = id_in_table,
                workspace_name = workspace_name,
-               workspace_namespace = workspace_namespace
+               workspace_namespace = workspace_namespace,
+               stop_on_fail = stop_on_fail
     }
 
     output {
@@ -61,6 +63,7 @@ task compare_sample_sets {
         String id_in_table
         String workspace_name
         String workspace_namespace
+        Boolean stop_on_fail = true
     }
 
     command <<<
@@ -88,7 +91,7 @@ task compare_sample_sets {
         vcf_samples <- readLines('~{sample_file}'); \
         if (setequal(samples, vcf_samples)) status <- 'PASS' else status <- 'FAIL'; \
         cat(status, file='status.txt'); \
-        if (status == 'FAIL') stop('Samples do not match; compare vcf_samples.txt and workspace_samples.txt')
+        if (as.logical(toupper('~{stop_on_fail}')) & status == 'FAIL') stop('Samples do not match; compare vcf_samples.txt and workspace_samples.txt')
         "
     >>>
 
