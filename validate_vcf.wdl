@@ -1,17 +1,16 @@
 version 1.0
 
 import "check_vcf_samples.wdl" as vcf
-import "validate_gregor_model.wdl" as validate
 
 workflow validate_vcf {
     input {
-        Array[File] table_files
+        Map[String, File] table_files
         String workspace_name
         String workspace_namespace
     }
 
-    call validate.select_vcf_files {
-        input: validated_table_files = table_files
+    call select_vcf_files {
+        input: table_files = table_files
     }
 
     if (select_vcf_files.files_to_check[0] != "NULL") {
@@ -41,5 +40,56 @@ workflow validate_vcf {
      meta {
           author: "Stephanie Gogarten"
           email: "sdmorris@uw.edu"
+    }
+}
+
+
+task select_vcf_files {    
+    input {
+        Map[String, File] table_files
+    }
+
+    command <<<
+        Rscript -e "\
+        library(tidyverse); \
+        table_files <- read_tsv('~{write_map(table_files)}', col_names=c("names", "files"), col_types="cc"); \
+        tables <- table_files[['files']]; \
+        names(tables) <- table_files[['names']]; \
+        vcf_cols <- c('called_variants_dna_short_read'='called_variants_dna_file', \
+            'called_variants_nanopore'='called_variants_dna_file',
+            'called_variants_pac_bio'='called_variants_dna_file', \
+            'called_variants_optical_mapping'='optical_mapping_vcf_file'); \
+        id_cols <- c('called_variants_dna_short_read'='called_variants_dna_short_read_id', \
+            'called_variants_nanopore'='called_variants_nanopore_id', \
+            'called_variants_pac_bio'='called_variants_pac_bio_id', \
+            'called_variants_optical_mapping'='called_variants_optical_mapping_id'); \
+        tables <- tables[names(tables) %in% names(vcf_cols)]; \
+        files <- list(); ids <- list(); types <- list(); \
+        for (t in names(tables)) { \
+          dat <- readr::read_tsv(tables[t]); \
+          files[[t]] <- dat[[vcf_cols[t]]]; \
+          ids[[t]] <- dat[[id_cols[t]]]; \
+          types[[t]] <- rep(sub('^called_variants_', '', t), nrow(dat)); \
+        }; \
+        if (length(unlist(files)) > 0) { \
+          writeLines(unlist(files), 'file.txt'); \
+          writeLines(unlist(ids), 'id.txt'); \
+          writeLines(unlist(types), 'type.txt'); \
+        } else { \
+          writeLines('NULL', 'file.txt'); \
+          writeLines('NULL', 'id.txt'); \
+          writeLines('NULL', 'type.txt'); \
+        } \
+        "
+    >>>
+
+    output {
+        Array[String] files_to_check = read_lines("file.txt")
+        Array[String] ids_to_check = read_lines("id.txt")
+        Array[String] types_to_check = read_lines("type.txt")
+    }
+
+    runtime {
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
     }
 }
