@@ -52,7 +52,7 @@ task select_vcf_files {
     command <<<
         Rscript -e "\
         library(tidyverse); \
-        table_files <- read_tsv('~{write_map(table_files)}', col_names=c("names", "files"), col_types="cc"); \
+        table_files <- read_tsv('~{write_map(table_files)}', col_names=c('names', 'files'), col_types='cc'); \
         print(head(table_files)); \
         tables <- table_files[['files']]; \
         names(tables) <- table_files[['names']]; \
