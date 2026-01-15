@@ -53,10 +53,8 @@ task select_vcf_files {
         Rscript -e "\
         library(tidyverse); \
         table_files <- read_tsv('~{write_map(table_files)}', col_names=c('names', 'files'), col_types='cc'); \
-        print(head(table_files)); \
         tables <- table_files[['files']]; \
         names(tables) <- table_files[['names']]; \
-        print(head(tables)); \
         vcf_cols <- c('called_variants_dna_short_read'='called_variants_dna_file', \
             'called_variants_nanopore'='called_variants_dna_file',
             'called_variants_pac_bio'='called_variants_dna_file', \
@@ -75,7 +73,7 @@ task select_vcf_files {
         }; \
         if (length(unlist(files)) > 0) { \
           writeLines(unlist(files), 'file.txt'); \
-          writeLines(unlist(ids), 'id.txt'); \
+          writeLines(as.character(unlist(ids)), 'id.txt'); \
           writeLines(unlist(types), 'type.txt'); \
         } else { \
           writeLines('NULL', 'file.txt'); \
