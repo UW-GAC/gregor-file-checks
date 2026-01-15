@@ -27,19 +27,53 @@ workflow validate_vcf {
             }
         }
 
-        call vcf.summarize_vcf_check {
+        call summarize_vcf_check_samples {
             input: file = select_vcf_files.files_to_check,
                 vcf_check = check_vcf_samples.vcf_sample_check
+
         }
     }
 
     output {
-        String? vcf_check_summary = summarize_vcf_check.summary
-        File? vcf_check_details = summarize_vcf_check.details
+        String? vcf_check_summary = summarize_vcf_check_samples.summary
+        File? vcf_check_details = summarize_vcf_check_samples.details
     }
 
      meta {
           author: "Stephanie Gogarten"
           email: "sdmorris@uw.edu"
+    }
+}
+
+
+task summarize_vcf_check_samples {
+    input {
+        Array[String] file
+        Array[String] vcf_check
+        Array[String] first_vcf_sample
+        Array[String] first_workspace_sample
+    }
+
+    command <<<
+        Rscript -e "\
+        files <- readLines('~{write_lines(file)}'); \
+        checks <- readLines('~{write_lines(vcf_check)}'); \
+        vcf_sample <- readLines('~{write_lines(first_vcf_sample)}'); \
+        workspace_sample <- readLines('~{write_lines(first_workspace_sample)}'); \
+        library(dplyr); \
+        dat <- tibble(file_path=files, vcf_check=checks, first_vcf_sample=vcf_sample, first_workspace_sample=workspace_sample); \
+        readr::write_tsv(dat, 'details.txt'); \
+        ct <- mutate(count(dat, vcf_check), x=paste(n, vcf_check)); \
+        writeLines(paste(ct[['x']], collapse=', '), 'summary.txt'); \
+        "
+    >>>
+    
+    output {
+        String summary = read_string("summary.txt")
+        File details = "details.txt"
+    }
+
+    runtime {
+        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
     }
 }
