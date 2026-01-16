@@ -19,3 +19,6 @@ workflows:
    - name: validate_md5
      subclass: WDL
      primaryDescriptorPath: /validate_md5.wdl
+   - name: validate_vcf
+     subclass: WDL
+     primaryDescriptorPath: /validate_vcf.wdl

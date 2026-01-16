@@ -7,6 +7,7 @@ workflow check_vcf_samples {
         String id_in_table
         String workspace_name
         String workspace_namespace
+        Boolean stop_on_fail = true
     }
 
     Int disk_gb = ceil(size(vcf_file, "GB")*1.5) + 5
@@ -21,11 +22,14 @@ workflow check_vcf_samples {
                data_type = data_type,
                id_in_table = id_in_table,
                workspace_name = workspace_name,
-               workspace_namespace = workspace_namespace
+               workspace_namespace = workspace_namespace,
+               stop_on_fail = stop_on_fail
     }
 
     output {
         String vcf_sample_check = compare_sample_sets.check_status
+        String first_workspace_sample = compare_sample_sets.first_workspace_sample
+        String first_vcf_sample = compare_sample_sets.first_vcf_sample
     }
 
      meta {
@@ -61,6 +65,7 @@ task compare_sample_sets {
         String id_in_table
         String workspace_name
         String workspace_namespace
+        Boolean stop_on_fail = true
     }
 
     command <<<
@@ -85,16 +90,20 @@ task compare_sample_sets {
         experiment_table <- AnVIL::avtable(experiment_table_name, name=workspace_name, namespace=workspace_namespace); \
         if ('experiment_sample_id' %in% names(experiment_table)) samples <- experiment_table[['experiment_sample_id']][experiment_table[[experiment_id_name]] %in% experiments] else samples <- experiments; \
         writeLines(as.character(samples), 'workspace_samples.txt'); \
+        cat(as.character(samples[1]), file='first_workspace_sample.txt'); \
         vcf_samples <- readLines('~{sample_file}'); \
+        cat(as.character(vcf_samples[1]), file='first_vcf_sample.txt'); \
         if (setequal(samples, vcf_samples)) status <- 'PASS' else status <- 'FAIL'; \
         cat(status, file='status.txt'); \
-        if (status == 'FAIL') stop('Samples do not match; compare vcf_samples.txt and workspace_samples.txt')
+        if (as.logical(toupper('~{stop_on_fail}')) & status == 'FAIL') stop('Samples do not match; compare vcf_samples.txt and workspace_samples.txt')
         "
     >>>
 
     output {
         String check_status = read_string("status.txt")
         File workspace_samples = "workspace_samples.txt"
+        String first_workspace_sample = read_string("first_workspace_sample.txt")
+        String first_vcf_sample = read_string("first_vcf_sample.txt")
     }
 
     runtime {
