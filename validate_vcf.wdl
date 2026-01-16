@@ -29,7 +29,9 @@ workflow validate_vcf {
 
         call summarize_vcf_check_samples {
             input: file = select_vcf_files.files_to_check,
-                vcf_check = check_vcf_samples.vcf_sample_check
+                vcf_check = check_vcf_samples.vcf_sample_check,
+                first_vcf_sample = check_vcf_samples.first_vcf_sample,
+                first_workspace_sample = check_vcf_samples.first_workspace_sample
 
         }
     }
