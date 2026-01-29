@@ -11,17 +11,19 @@ workflow validate_md5 {
             table_name = table_name
     }
 
-    call check_md5 {
-        input:
-            data_table = data_table,
-            file_column = identify_columns.file_column,
-            md5_column = identify_columns.md5_column,
-            id_column = identify_columns.id_column
+    if (identify_columns.check_table) {
+        call check_md5 {
+            input:
+                data_table = data_table,
+                file_column = identify_columns.file_column,
+                md5_column = identify_columns.md5_column,
+                id_column = identify_columns.id_column
+        }
     }
 
     output {
-        File md5_check = check_md5.md5_check
-        String md5_check_status = check_md5.md5_check_status
+        File? md5_check = check_md5.md5_check
+        String? md5_check_status = check_md5.md5_check_status
     }
 }
 
@@ -68,6 +70,11 @@ task identify_columns {
           'processed_file_metabolomics'='processed_file_metabolomics_id',
           'harmonized_file_metabolomics'='harmonized_file_metabolomics_id');
         md5_col <- "md5sum"
+        if ("~{table_name}" %in% names(file_cols)) {
+          writeLines("true", "check_table.txt")
+        } else {
+          writeLines("false", "check_table.txt")
+        }
         writeLines(file_cols["~{table_name}"], "file_column.txt")
         writeLines(id_cols["~{table_name}"], "id_column.txt")
         writeLines(md5_col, "md5_column.txt")
@@ -78,6 +85,7 @@ task identify_columns {
         String file_column = read_string("file_column.txt")
         String id_column = read_string("id_column.txt")
         String md5_column = read_string("md5_column.txt")
+        Boolean check_table = read_boolean("check_table.txt")
     }
 
     runtime {
