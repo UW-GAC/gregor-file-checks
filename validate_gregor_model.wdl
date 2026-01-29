@@ -1,7 +1,8 @@
-version 1.0
+version 1.1
 
 import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/validate_data_model.wdl" as validate
-import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/check_md5.wdl" as md5
+#import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/check_md5.wdl" as md5
+import "validate_md5.wdl" as md5
 import "check_vcf_samples.wdl" as vcf
 import "check_bam_sample.wdl" as bam
 
@@ -33,6 +34,16 @@ workflow validate_gregor_model {
                check_bucket_paths = check_bucket_paths
     }
 
+    if (check_md5) {
+        scatter(pair in as_pair(table_files)) {
+            call md5.validate_md5 {
+                input: data_table = pair.right,
+                    table_name = pair.left,
+                    stop_on_fail = true
+            }
+        }
+    }
+
     # need this because validate.tables is optional but input to select_md5_files is required
     Array[File] val_tables = select_first([validate.tables, ""])
 
@@ -43,27 +54,27 @@ workflow validate_gregor_model {
             }
         }
 
-        if (check_md5) {
-            call select_md5_files {
-                input: validated_table_files = val_tables
-            }
+        # if (check_md5) {
+        #     call select_md5_files {
+        #         input: validated_table_files = val_tables
+        #     }
 
-            if (select_md5_files.files_to_check[0] != "NULL") {
-                scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
-                    call md5.md5check {
-                        input: file = pair.left,
-                            md5sum = pair.right,
-                            project_id = project_id
-                    }
-                }
+        #     if (select_md5_files.files_to_check[0] != "NULL") {
+        #         scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
+        #             call md5.md5check {
+        #                 input: file = pair.left,
+        #                     md5sum = pair.right,
+        #                     project_id = project_id
+        #             }
+        #         }
 
-                call md5.summarize_md5_check {
-                    input: file = select_md5_files.files_to_check,
-                        md5_check = md5check.md5_check,
-                        id = select_md5_files.ids_to_check
-                }
-            }
-        }
+        #         call md5.summarize_md5_check {
+        #             input: file = select_md5_files.files_to_check,
+        #                 md5_check = md5check.md5_check,
+        #                 id = select_md5_files.ids_to_check
+        #         }
+        #     }
+        # }
 
         # can only check VCF files once tables are imported since check_vcf_samples reads tables
         if (check_vcf && import_tables) {
@@ -79,7 +90,8 @@ workflow validate_gregor_model {
                             id_in_table = pair.left.right,
                             data_type = pair.right,
                             workspace_name = workspace_name,
-                            workspace_namespace = workspace_namespace
+                            workspace_namespace = workspace_namespace,
+                            stop_on_fail = true
                     }
                 }
 
@@ -118,8 +130,10 @@ workflow validate_gregor_model {
     output {
         File validation_report = validate.validation_report
         Array[File]? tables = validate.tables
-        String? md5_check_summary = summarize_md5_check.summary
-        File? md5_check_details = summarize_md5_check.details
+        #String? md5_check_summary = summarize_md5_check.summary
+        #File? md5_check_details = summarize_md5_check.details
+        Array[String]? md5_check_status = validate_md5.md5_check_status
+        Array[File]? md5_check_details = validate_md5.md5_check
         String? vcf_check_summary = summarize_vcf_check.summary
         File? vcf_check_details = summarize_vcf_check.details
         String? bam_check_summary = summarize_bam_check.summary
