@@ -4,6 +4,7 @@ workflow validate_md5 {
     input {
         File data_table
         String table_name
+        Boolean stop_on_fail = false
     }
 
     call identify_columns {
@@ -100,6 +101,7 @@ task check_md5 {
         String file_column
         String md5_column
         String id_column
+        Boolean stop_on_fail
     }
 
     command <<<
@@ -126,6 +128,9 @@ task check_md5 {
         write_tsv(tbl, "md5_check.txt")
         status <- if (all(tbl[["status"]] == "PASS")) "PASS" else "FAIL"
         writeLines(status, "status.txt")
+        if (as.logical(toupper('~{stop_on_fail}')) & status == 'FAIL') {
+            stop('md5 check failed; see md5_check.txt for details')
+        }
         RSCRIPT
     >>>
 
