@@ -1,4 +1,4 @@
-version 1.0
+version 1.1
 
 workflow validate_md5 {
     input {
@@ -18,7 +18,8 @@ workflow validate_md5 {
                 data_table = data_table,
                 file_column = identify_columns.file_column,
                 md5_column = identify_columns.md5_column,
-                id_column = identify_columns.id_column
+                id_column = identify_columns.id_column,
+                stop_on_fail = stop_on_fail
         }
     }
 
