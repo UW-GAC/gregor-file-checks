@@ -1,7 +1,6 @@
 version 1.1
 
 import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/refs/heads/v1.1/validate_data_model.wdl" as validate
-#import "https://raw.githubusercontent.com/UW-GAC/anvil-util-workflows/main/check_md5.wdl" as md5
 import "validate_md5.wdl" as md5
 import "check_vcf_samples.wdl" as vcf
 import "check_bam_sample.wdl" as bam
@@ -44,7 +43,7 @@ workflow validate_gregor_model {
         }
     }
 
-    # need this because validate.tables is optional but input to select_md5_files is required
+    # need this because validate.tables is optional but input to other tasks is required
     Array[File] val_tables = select_first([validate.tables, ""])
 
     if (defined(validate.tables)) {
@@ -53,28 +52,6 @@ workflow validate_gregor_model {
                 input: validated_table_files = val_tables
             }
         }
-
-        # if (check_md5) {
-        #     call select_md5_files {
-        #         input: validated_table_files = val_tables
-        #     }
-
-        #     if (select_md5_files.files_to_check[0] != "NULL") {
-        #         scatter (pair in zip(select_md5_files.files_to_check, select_md5_files.md5sum_to_check)) {
-        #             call md5.md5check {
-        #                 input: file = pair.left,
-        #                     md5sum = pair.right,
-        #                     project_id = project_id
-        #             }
-        #         }
-
-        #         call md5.summarize_md5_check {
-        #             input: file = select_md5_files.files_to_check,
-        #                 md5_check = md5check.md5_check,
-        #                 id = select_md5_files.ids_to_check
-        #         }
-        #     }
-        # }
 
         # can only check VCF files once tables are imported since check_vcf_samples reads tables
         if (check_vcf && import_tables) {
@@ -130,8 +107,6 @@ workflow validate_gregor_model {
     output {
         File validation_report = validate.validation_report
         Array[File]? tables = validate.tables
-        #String? md5_check_summary = summarize_md5_check.summary
-        #File? md5_check_details = summarize_md5_check.details
         Array[String?]? md5_check_status = validate_md5.md5_check_status
         Array[File?]? md5_check_details = validate_md5.md5_check
         String? vcf_check_summary = summarize_vcf_check.summary
@@ -198,80 +173,6 @@ task check_term_id {
     }
 }
 
-
-task select_md5_files {
-    input {
-        Array[File] validated_table_files
-    }
-
-    command <<<
-        Rscript -e "\
-        tables <- readLines('~{write_lines(validated_table_files)}'); \
-        names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
-        md5_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_file', \
-          'called_variants_dna_short_read'='called_variants_dna_file', \
-          'aligned_rna_short_read'='aligned_rna_short_read_file', \
-          'readcounts_rna_short_read'='readcounts_rna_file', \
-          'aligned_nanopore'='aligned_nanopore_file', \
-          'called_variants_nanopore'='called_variants_dna_file', \
-          'aligned_pac_bio'='aligned_pac_bio_file', \
-          'called_variants_pac_bio'='called_variants_dna_file', \
-          'aligned_atac_short_read'='aligned_atac_short_read_file', \
-          'called_peaks_atac_short_read'='called_peaks_file', \
-          'molecule_file_optical_mapping'='bnx_file', \
-          'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_file', \
-          'called_variants_optical_mapping'='optical_mapping_vcf_file', \
-          'mass_spectra_metabolomics'='mass_spectra_file', \
-          'preprocessed_file_metabolomics'='preprocessed_file', \
-          'processed_file_metabolomics'='processed_file', \
-          'harmonized_file_metabolomics'='harmonized_file'); \
-        id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id', \
-          'called_variants_dna_short_read'='called_variants_dna_short_read_id', \
-          'aligned_rna_short_read'='aligned_rna_short_read_id', \
-          'readcounts_rna_short_read'='readcounts_rna_short_read_id', \
-          'aligned_nanopore'='aligned_nanopore_id', \
-          'called_variants_nanopore'='called_variants_nanopore_id', \
-          'aligned_pac_bio'='aligned_pac_bio_id', \
-          'called_variants_pac_bio'='called_variants_pac_bio_id', \
-          'aligned_atac_short_read'='aligned_atac_short_read_id', \
-          'called_peaks_atac_short_read'='called_peaks_atac_short_read_id', \
-          'molecule_file_optical_mapping'='molecule_file_optical_mapping_id', \
-          'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_id', \
-          'called_variants_optical_mapping'='called_variants_optical_mapping_id', \
-          'mass_spectra_metabolomics'='mass_spectra_metabolomics_id', \
-          'preprocessed_file_metabolomics'='preprocessed_file_metabolomics_id', \
-          'processed_file_metabolomics'='processed_file_metabolomics_id', \
-          'harmonized_file_metabolomics'='harmonized_file_metabolomics_id'); \
-        tables <- tables[names(tables) %in% names(md5_cols)]; \
-        files <- list(); md5 <- list(); ids <- list(); \
-        for (t in names(tables)) { \
-          dat <- readr::read_tsv(tables[t]); \
-          files[[t]] <- dat[[md5_cols[t]]]; \
-          md5[[t]] <- dat[['md5sum']]; \
-          ids[[t]] <- dat[[id_cols[t]]]; \
-        }; \
-        if (length(unlist(files)) > 0) { \
-          writeLines(unlist(files), 'file.txt'); \
-          writeLines(unlist(md5), 'md5sum.txt'); \
-          writeLines(unlist(ids), 'id.txt'); \
-        } else { \
-          writeLines('NULL', 'file.txt'); \
-          writeLines('NULL', 'md5sum.txt'); \
-          writeLines('NULL', 'id.txt'); \
-        } \
-        "
-    >>>
-
-    output {
-        Array[String] files_to_check = read_lines("file.txt")
-        Array[String] md5sum_to_check = read_lines("md5sum.txt")
-        Array[String] ids_to_check = read_lines("id.txt")
-    }
-
-    runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
-    }
-}
 
 
 task select_vcf_files {    
