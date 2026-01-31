@@ -219,7 +219,7 @@ task select_vcf_files {
     }
 
     runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
+        docker: "rocker/tidyverse:4"
     }
 }
 
@@ -272,6 +272,6 @@ task select_bam_files {
     }
 
     runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
+        docker: "rocker/tidyverse:4"
     }
 }
