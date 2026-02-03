@@ -136,6 +136,6 @@ task summarize_vcf_check {
     }
 
     runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
+        docker: "rocker/tidyverse:4"
     }
 }
