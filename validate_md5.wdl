@@ -33,6 +33,7 @@ workflow validate_md5 {
     output {
         File? md5_check = check_md5.md5_check
         String? md5_check_status = check_md5.md5_check_status
+        String? md5_check_summary = summarize_md5_check.summary
     }
 }
 
