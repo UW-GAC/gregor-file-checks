@@ -186,12 +186,10 @@ task select_vcf_files {
         names(tables) <- sub('^output_', '', sub('_table.tsv', '', basename(tables))); \
         vcf_cols <- c('called_variants_dna_short_read'='called_variants_dna_file', \
             'called_variants_nanopore'='called_variants_dna_file',
-            'called_variants_pac_bio'='called_variants_dna_file', \
-            'called_variants_optical_mapping'='optical_mapping_vcf_file'); \
+            'called_variants_pac_bio'='called_variants_dna_file'); \
         id_cols <- c('called_variants_dna_short_read'='called_variants_dna_short_read_id', \
             'called_variants_nanopore'='called_variants_nanopore_id', \
-            'called_variants_pac_bio'='called_variants_pac_bio_id', \
-            'called_variants_optical_mapping'='called_variants_optical_mapping_id'); \
+            'called_variants_pac_bio'='called_variants_pac_bio_id'); \
         tables <- tables[names(tables) %in% names(vcf_cols)]; \
         files <- list(); ids <- list(); types <- list(); \
         for (t in names(tables)) { \
