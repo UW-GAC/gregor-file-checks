@@ -18,14 +18,7 @@ workflow validate_md5 {
                 data_table = data_table,
                 file_column = identify_columns.file_column,
                 md5_column = identify_columns.md5_column,
-                id_column = identify_columns.id_column
-        }
-
-        call summarize_md5_check {
-            input:
-                md5_check = check_md5.md5_check,
-                table_name = table_name,
-                status = check_md5.md5_check_status,
+                id_column = identify_columns.id_column,
                 stop_on_fail = stop_on_fail
         }
     }
@@ -109,6 +102,7 @@ task check_md5 {
         String file_column
         String md5_column
         String id_column
+        Boolean stop_on_fail
     }
 
     command <<<
@@ -135,6 +129,9 @@ task check_md5 {
         write_tsv(tbl, "md5_check.txt")
         status <- if (all(tbl[["status"]] == "PASS")) "PASS" else "FAIL"
         writeLines(status, "status.txt")
+        if (as.logical(toupper('~{stop_on_fail}')) & status == 'FAIL') {
+            stop('md5 check failed; see md5_check.txt for details')
+        }
         RSCRIPT
     >>>
 
@@ -148,32 +145,3 @@ task check_md5 {
     }
 }
 
-
-task summarize_md5_check {
-    input {
-        File md5_check
-        String table_name
-        String status
-        Boolean stop_on_fail
-    }
-
-    command <<<
-        R << RSCRIPT
-        library(tidyverse)
-        dat <- read_tsv('~{md5_check}')
-        ct <- mutate(count(dat, status), x=paste(n, status))
-        writeLines(paste('~{table_name}:', ct[['x']], collapse=', '), 'summary.txt')
-        if (as.logical(toupper('~{stop_on_fail}')) & '~{status}' == 'FAIL') {
-            stop('md5 check failed; see md5_check.txt for details')
-        }
-        RSCRIPT
-    >>>
-    
-    output {
-        String summary = read_string("summary.txt")
-    }
-
-    runtime {
-        docker: "rocker/tidyverse:4"
-    }
-}
