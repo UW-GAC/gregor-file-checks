@@ -109,7 +109,6 @@ workflow validate_gregor_model {
         Array[File]? tables = validate.tables
         Array[String?]? md5_check_status = validate_md5.md5_check_status
         Array[File?]? md5_check_details = validate_md5.md5_check
-        Array[String?]? md5_check_summary = validate_md5.md5_check_summary
         String? vcf_check_summary = summarize_vcf_check.summary
         File? vcf_check_details = summarize_vcf_check.details
         String? bam_check_summary = summarize_bam_check.summary
