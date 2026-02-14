@@ -41,6 +41,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run womtool
-        uses: UW-GAC/womtool-action@main
+        uses: UW-GAC/womtool-action@feature/specify-womtool-version
         with:
             wdl-file: ${{ matrix.wdl-file }}
+            womtool-version: "92"
