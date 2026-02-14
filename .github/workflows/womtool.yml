@@ -45,3 +45,4 @@ jobs:
         with:
             wdl-file: ${{ matrix.wdl-file }}
             womtool-version: "92"
+            java-version: "17"

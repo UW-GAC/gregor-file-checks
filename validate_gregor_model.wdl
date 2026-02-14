@@ -272,3 +272,4 @@ task select_bam_files {
         docker: "rocker/tidyverse:4"
     }
 }
+
