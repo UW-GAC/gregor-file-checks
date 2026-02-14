@@ -174,7 +174,6 @@ task check_term_id {
 }
 
 
-
 task select_vcf_files {    
     input {
         Array[File] validated_table_files
