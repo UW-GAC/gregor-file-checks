@@ -1,9 +1,10 @@
-version 1.0
+version 1.1
 
 workflow validate_md5 {
     input {
         File data_table
         String table_name
+        Boolean stop_on_fail = false
     }
 
     call identify_columns {
@@ -11,17 +12,20 @@ workflow validate_md5 {
             table_name = table_name
     }
 
-    call check_md5 {
-        input:
-            data_table = data_table,
-            file_column = identify_columns.file_column,
-            md5_column = identify_columns.md5_column,
-            id_column = identify_columns.id_column
+    if (identify_columns.check_table) {
+        call check_md5 {
+            input:
+                data_table = data_table,
+                file_column = identify_columns.file_column,
+                md5_column = identify_columns.md5_column,
+                id_column = identify_columns.id_column,
+                stop_on_fail = stop_on_fail
+        }
     }
 
     output {
-        File md5_check = check_md5.md5_check
-        String md5_check_status = check_md5.md5_check_status
+        File? md5_check = check_md5.md5_check
+        String? md5_check_status = check_md5.md5_check_status
     }
 }
 
@@ -51,23 +55,28 @@ task identify_columns {
           'processed_file_metabolomics'='processed_file',
           'harmonized_file_metabolomics'='harmonized_file');
         id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id',
-          'called_variants_dna_short_read'='called_variants_dna_short_read_id',
+          'called_variants_dna_short_read'='aligned_dna_short_read_set_id',
           'aligned_rna_short_read'='aligned_rna_short_read_id',
-          'readcounts_rna_short_read'='readcounts_rna_short_read_id',
+          'readcounts_rna_short_read'='aligned_rna_short_read_set_id',
           'aligned_nanopore'='aligned_nanopore_id',
-          'called_variants_nanopore'='called_variants_nanopore_id',
+          'called_variants_nanopore'='aligned_nanopore_set_id',
           'aligned_pac_bio'='aligned_pac_bio_id',
-          'called_variants_pac_bio'='called_variants_pac_bio_id',
+          'called_variants_pac_bio'='aligned_pac_bio_set_id',
           'aligned_atac_short_read'='aligned_atac_short_read_id',
-          'called_peaks_atac_short_read'='called_peaks_atac_short_read_id',
+          'called_peaks_atac_short_read'='aligned_atac_short_read_id',
           'molecule_file_optical_mapping'='molecule_file_optical_mapping_id',
           'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_id',
-          'called_variants_optical_mapping'='called_variants_optical_mapping_id',
+          'called_variants_optical_mapping'='aligned_optical_mapping_set_id',
           'mass_spectra_metabolomics'='mass_spectra_metabolomics_id',
           'preprocessed_file_metabolomics'='preprocessed_file_metabolomics_id',
           'processed_file_metabolomics'='processed_file_metabolomics_id',
           'harmonized_file_metabolomics'='harmonized_file_metabolomics_id');
         md5_col <- "md5sum"
+        if ("~{table_name}" %in% names(file_cols)) {
+          writeLines("true", "check_table.txt")
+        } else {
+          writeLines("false", "check_table.txt")
+        }
         writeLines(file_cols["~{table_name}"], "file_column.txt")
         writeLines(id_cols["~{table_name}"], "id_column.txt")
         writeLines(md5_col, "md5_column.txt")
@@ -78,6 +87,7 @@ task identify_columns {
         String file_column = read_string("file_column.txt")
         String id_column = read_string("id_column.txt")
         String md5_column = read_string("md5_column.txt")
+        Boolean check_table = read_boolean("check_table.txt")
     }
 
     runtime {
@@ -92,6 +102,7 @@ task check_md5 {
         String file_column
         String md5_column
         String id_column
+        Boolean stop_on_fail
     }
 
     command <<<
@@ -118,6 +129,9 @@ task check_md5 {
         write_tsv(tbl, "md5_check.txt")
         status <- if (all(tbl[["status"]] == "PASS")) "PASS" else "FAIL"
         writeLines(status, "status.txt")
+        if (as.logical(toupper('~{stop_on_fail}')) & status == 'FAIL') {
+            stop('md5 check failed; see md5_check.txt for details')
+        }
         RSCRIPT
     >>>
 

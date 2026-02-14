@@ -1,4 +1,4 @@
-version 1.0
+version 1.1
 
 workflow check_vcf_samples {
     input {
@@ -136,6 +136,6 @@ task summarize_vcf_check {
     }
 
     runtime {
-        docker: "us.gcr.io/broad-dsp-gcr-public/anvil-rstudio-bioconductor:3.17.0"
+        docker: "rocker/tidyverse:4"
     }
 }
