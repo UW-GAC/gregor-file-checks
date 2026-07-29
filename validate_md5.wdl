@@ -41,6 +41,7 @@ task identify_columns {
           'called_variants_dna_short_read'='called_variants_dna_file',
           'aligned_rna_short_read'='aligned_rna_short_read_file',
           'readcounts_rna_short_read'='readcounts_rna_file',
+          'outrider_rna_short_read'='outrider_file',
           'aligned_nanopore'='aligned_nanopore_file',
           'called_variants_nanopore'='called_variants_dna_file',
           'aligned_pac_bio'='aligned_pac_bio_file',
@@ -50,6 +51,12 @@ task identify_columns {
           'molecule_file_optical_mapping'='bnx_file',
           'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_file',
           'called_variants_optical_mapping'='optical_mapping_vcf_file',
+          'aligned_iclr'='aligned_iclr_file',
+          'called_variants_iclr'='called_variants_dna_file',
+          'aligned_chiatac'='aligned_chiatac_file',
+          'called_peaks_chiatac'='called_peaks_file',
+          'interaction_loops_chiatac'='interaction_loops_file',
+          'contact_map_chiatac'='contact_map_file',
           'mass_spectra_metabolomics'='mass_spectra_file',
           'preprocessed_file_metabolomics'='preprocessed_file',
           'processed_file_metabolomics'='processed_file',
@@ -57,6 +64,7 @@ task identify_columns {
         id_cols <- c('aligned_dna_short_read'='aligned_dna_short_read_id',
           'called_variants_dna_short_read'='aligned_dna_short_read_set_id',
           'aligned_rna_short_read'='aligned_rna_short_read_id',
+          'outrider_rna_short_read'='outrider_rna_short_read_id',
           'readcounts_rna_short_read'='aligned_rna_short_read_set_id',
           'aligned_nanopore'='aligned_nanopore_id',
           'called_variants_nanopore'='aligned_nanopore_set_id',
@@ -67,11 +75,40 @@ task identify_columns {
           'molecule_file_optical_mapping'='molecule_file_optical_mapping_id',
           'aligned_molecules_optical_mapping'='aligned_molecules_optical_mapping_id',
           'called_variants_optical_mapping'='aligned_optical_mapping_set_id',
+          'aligned_iclr'='aligned_iclr_id',
+          'called_variants_iclr'='called_variants_iclr_id',
+          'aligned_chiatac'='aligned_chiatac_id',
+          'called_peaks_chiatac'='called_peaks_chiatac_id',
+          'interaction_loops_chiatac'='interaction_loops_chiatac_id',
+          'contact_map_chiatac'='contact_map_chiatac_id',
           'mass_spectra_metabolomics'='mass_spectra_metabolomics_id',
           'preprocessed_file_metabolomics'='preprocessed_file_metabolomics_id',
           'processed_file_metabolomics'='processed_file_metabolomics_id',
           'harmonized_file_metabolomics'='harmonized_file_metabolomics_id');
-        md5_col <- "md5sum"
+        md5_cols <- c('aligned_dna_short_read'='md5sum',
+          'called_variants_dna_short_read'='md5sum',
+          'aligned_rna_short_read'='md5sum',
+          'outrider_rna_short_read'='md5sum',
+          'readcounts_rna_short_read'='md5sum',
+          'aligned_nanopore'='md5sum',
+          'called_variants_nanopore'='md5sum',
+          'aligned_pac_bio'='md5sum',
+          'called_variants_pac_bio'='md5sum',
+          'aligned_atac_short_read'='md5sum',
+          'called_peaks_atac_short_read'='peaks_md5sum',
+          'molecule_file_optical_mapping'='md5sum',
+          'aligned_molecules_optical_mapping'='md5sum',
+          'called_variants_optical_mapping'='md5sum',
+          'aligned_iclr'='md5sum',
+          'called_variants_iclr'='md5sum',
+          'aligned_chiatac'='md5sum',
+          'called_peaks_chiatac'='peaks_md5sum',
+          'interaction_loops_chiatac'='interaction_loops_md5sum',
+          'contact_map_chiatac'='contact_map_md5sum',
+          'mass_spectra_metabolomics'='md5sum',
+          'preprocessed_file_metabolomics'='md5sum',
+          'processed_file_metabolomics'='md5sum',
+          'harmonized_file_metabolomics'='md5sum');
         if ("~{table_name}" %in% names(file_cols)) {
           writeLines("true", "check_table.txt")
         } else {
@@ -79,7 +116,7 @@ task identify_columns {
         }
         writeLines(file_cols["~{table_name}"], "file_column.txt")
         writeLines(id_cols["~{table_name}"], "id_column.txt")
-        writeLines(md5_col, "md5_column.txt")
+        writeLines(md5_cols["~{table_name}"], "md5_column.txt")
         RSCRIPT
     >>>
 
